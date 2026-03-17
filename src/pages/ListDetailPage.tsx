@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useWordList } from '../hooks/useWordList';
+import { useWordLists } from '../hooks/useWordLists';
 import { WordTable } from '../components/wordlist/WordTable';
 import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
@@ -33,6 +34,7 @@ function ExerciseCard({ to, title, description, icon, disabled }: ExerciseCardPr
 export function ListDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { list, renameList } = useWordList(id!);
+  const { lists } = useWordLists();
 
   if (!list) {
     return <div className="text-center py-16 text-gray-500">List not found.</div>;
@@ -45,7 +47,7 @@ export function ListDetailPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <EditableTitle value={list.name} onSave={renameList} />
+          <EditableTitle value={list.name} onSave={renameList} existingNames={lists.map((l) => l.name)} />
           <p className="text-sm text-gray-500 mt-1">{list.words.length} word{list.words.length !== 1 ? 's' : ''}</p>
         </div>
         <Link to={`/list/${id}/edit`}>

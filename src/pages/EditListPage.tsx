@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useWordList } from '../hooks/useWordList';
+import { useWordLists } from '../hooks/useWordLists';
 import { WordTable } from '../components/wordlist/WordTable';
 import { AddWordForm } from '../components/wordlist/AddWordForm';
 import { FileUpload } from '../components/wordlist/FileUpload';
@@ -12,6 +13,7 @@ export function EditListPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { list, addWord, updateWord, deleteWord, saveWords, renameList } = useWordList(id!);
+  const { lists } = useWordLists();
 
   if (!list) {
     return <div className="text-center py-16 text-gray-500">List not found.</div>;
@@ -31,7 +33,7 @@ export function EditListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <EditableTitle value={list.name} onSave={renameList} />
+          <EditableTitle value={list.name} onSave={renameList} existingNames={lists.map((l) => l.name)} />
           <p className="text-sm text-gray-500 mt-1">{list.words.length} word{list.words.length !== 1 ? 's' : ''}</p>
         </div>
         <Button variant="secondary" onClick={() => navigate(`/list/${id}`)}>

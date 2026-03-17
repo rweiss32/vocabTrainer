@@ -5,31 +5,50 @@ import { Button } from '../common/Button';
 
 interface WordListCardProps {
   list: WordList;
+  existingNames: string[];
   onDelete: (id: string) => void;
   onRename: (id: string, name: string) => void;
 }
 
-export function WordListCard({ list, onDelete, onRename }: WordListCardProps) {
+export function WordListCard({ list, existingNames, onDelete, onRename }: WordListCardProps) {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(list.name);
 
+  const isDuplicate =
+    name.trim().toLowerCase() !== list.name.toLowerCase() &&
+    existingNames.some((n) => n.toLowerCase() === name.trim().toLowerCase());
+
   function handleRename() {
     const trimmed = name.trim();
-    if (trimmed && trimmed !== list.name) onRename(list.id, trimmed);
+    if (trimmed && trimmed !== list.name && !isDuplicate) onRename(list.id, trimmed);
     setEditing(false);
+    setName(list.name);
+  }
+
+  function handleCancel() {
+    setEditing(false);
+    setName(list.name);
   }
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
       {editing ? (
-        <input
-          autoFocus
-          className="text-lg font-semibold text-gray-900 border-b-2 border-indigo-400 outline-none w-full"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onBlur={handleRename}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') setEditing(false); }}
-        />
+        <div>
+          <input
+            autoFocus
+            className={`text-lg font-semibold text-gray-900 border-b-2 outline-none w-full ${isDuplicate ? 'border-red-400' : 'border-indigo-400'}`}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={handleRename}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleRename();
+              if (e.key === 'Escape') handleCancel();
+            }}
+          />
+          {isDuplicate && (
+            <p className="text-xs text-red-500 mt-1">A list with this name already exists.</p>
+          )}
+        </div>
       ) : (
         <h3
           className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-indigo-600 truncate"

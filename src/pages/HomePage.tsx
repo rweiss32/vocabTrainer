@@ -49,6 +49,7 @@ export function HomePage() {
             <WordListCard
               key={list.id}
               list={list}
+              existingNames={lists.map((l) => l.name)}
               onDelete={deleteList}
               onRename={renameList}
             />

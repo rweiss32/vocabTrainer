@@ -3,12 +3,17 @@ import { useState, useRef, useEffect } from 'react';
 interface EditableTitleProps {
   value: string;
   onSave: (name: string) => void;
+  existingNames?: string[];
 }
 
-export function EditableTitle({ value, onSave }: EditableTitleProps) {
+export function EditableTitle({ value, onSave, existingNames = [] }: EditableTitleProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isDuplicate =
+    draft.trim().toLowerCase() !== value.toLowerCase() &&
+    existingNames.some((n) => n.toLowerCase() === draft.trim().toLowerCase());
 
   useEffect(() => {
     if (editing) inputRef.current?.select();
@@ -21,7 +26,7 @@ export function EditableTitle({ value, onSave }: EditableTitleProps) {
 
   function commit() {
     const trimmed = draft.trim();
-    if (trimmed && trimmed !== value) onSave(trimmed);
+    if (trimmed && trimmed !== value && !isDuplicate) onSave(trimmed);
     setEditing(false);
   }
 
@@ -31,17 +36,22 @@ export function EditableTitle({ value, onSave }: EditableTitleProps) {
 
   if (editing) {
     return (
-      <input
-        ref={inputRef}
-        className="text-2xl font-bold text-gray-900 border-b-2 border-indigo-400 outline-none bg-transparent w-full max-w-sm"
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') commit();
-          if (e.key === 'Escape') cancel();
-        }}
-      />
+      <div>
+        <input
+          ref={inputRef}
+          className={`text-2xl font-bold text-gray-900 border-b-2 outline-none bg-transparent w-full max-w-sm ${isDuplicate ? 'border-red-400' : 'border-indigo-400'}`}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') commit();
+            if (e.key === 'Escape') cancel();
+          }}
+        />
+        {isDuplicate && (
+          <p className="text-xs text-red-500 mt-1">A list with this name already exists.</p>
+        )}
+      </div>
     );
   }
 
