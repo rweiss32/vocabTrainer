@@ -3,6 +3,7 @@ import { useWordList } from '../hooks/useWordList';
 import { WordTable } from '../components/wordlist/WordTable';
 import { AddWordForm } from '../components/wordlist/AddWordForm';
 import { FileUpload } from '../components/wordlist/FileUpload';
+import { ImageUpload } from '../components/wordlist/ImageUpload';
 import { Button } from '../components/common/Button';
 import { EditableTitle } from '../components/common/EditableTitle';
 import type { Word } from '../types';
@@ -47,6 +48,12 @@ export function EditListPage() {
         <h2 className="text-base font-semibold text-gray-800">Import from file</h2>
         <p className="text-sm text-gray-500">Upload a TSV or CSV file with columns: <code className="bg-gray-100 px-1 rounded">English term</code> and <code className="bg-gray-100 px-1 rounded">Translation</code></p>
         <FileUpload onImport={handleImport} />
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+        <h2 className="text-base font-semibold text-gray-800">Import from image</h2>
+        <p className="text-sm text-gray-500">Upload a photo or screenshot containing a list of printed English words. Translations will be suggested automatically.</p>
+        <ImageUpload onImport={handleImport} />
       </section>
 
       {list.words.length > 0 && (
