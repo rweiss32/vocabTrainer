@@ -10,9 +10,13 @@ export function HomePage() {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
 
+  const isDuplicate = lists.some(
+    (l) => l.name.toLowerCase() === newName.trim().toLowerCase()
+  );
+
   function handleCreate() {
     const name = newName.trim();
-    if (!name) return;
+    if (!name || isDuplicate) return;
     createList(name);
     setNewName('');
     setShowCreate(false);
@@ -59,7 +63,7 @@ export function HomePage() {
           footer={
             <>
               <Button variant="secondary" onClick={() => { setShowCreate(false); setNewName(''); }}>Cancel</Button>
-              <Button onClick={handleCreate} disabled={!newName.trim()}>Create</Button>
+              <Button onClick={handleCreate} disabled={!newName.trim() || isDuplicate}>Create</Button>
             </>
           }
         >
@@ -67,11 +71,14 @@ export function HomePage() {
             autoFocus
             type="text"
             placeholder="e.g. Unit 5 — Animals"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+            className={`w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 ${isDuplicate ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-indigo-400'}`}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
           />
+          {isDuplicate && (
+            <p className="text-xs text-red-500 mt-1">A list with this name already exists.</p>
+          )}
         </Modal>
       )}
     </>
