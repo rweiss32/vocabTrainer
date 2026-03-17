@@ -30,21 +30,22 @@ export function MatchingBoard({ words, onComplete }: MatchingBoardProps) {
   const [selectedTerm, setSelectedTerm] = useState<string | null>(null);
   const [selectedTranslation, setSelectedTranslation] = useState<string | null>(null);
   const [matched, setMatched] = useState<Set<string>>(new Set());
-  const [wrong, setWrong] = useState<Set<string>>(new Set());
+  const [wrongTerm, setWrongTerm] = useState<string | null>(null);
+  const [wrongTranslation, setWrongTranslation] = useState<string | null>(null);
   const [mistakes, setMistakes] = useState(0);
 
   const wordMap = useMemo(() => new Map(pairs.map((w) => [w.id, w])), [pairs]);
 
   function getTermState(id: string): ItemState {
     if (matched.has(id)) return 'correct';
-    if (wrong.has(id) && (selectedTerm === id || selectedTranslation === id)) return 'wrong';
+    if (wrongTerm === id) return 'wrong';
     if (selectedTerm === id) return 'selected';
     return 'idle';
   }
 
   function getTranslationState(id: string): ItemState {
     if (matched.has(id)) return 'correct';
-    if (wrong.has(id) && (selectedTerm === id || selectedTranslation === id)) return 'wrong';
+    if (wrongTranslation === id) return 'wrong';
     if (selectedTranslation === id) return 'selected';
     return 'idle';
   }
@@ -52,14 +53,16 @@ export function MatchingBoard({ words, onComplete }: MatchingBoardProps) {
   function handleSelectTerm(id: string) {
     if (matched.has(id)) return;
     setSelectedTerm(id);
-    setWrong(new Set());
+    setWrongTerm(null);
+    setWrongTranslation(null);
     if (selectedTranslation !== null) checkMatch(id, selectedTranslation);
   }
 
   function handleSelectTranslation(id: string) {
     if (matched.has(id)) return;
     setSelectedTranslation(id);
-    setWrong(new Set());
+    setWrongTerm(null);
+    setWrongTranslation(null);
     if (selectedTerm !== null) checkMatch(selectedTerm, id);
   }
 
@@ -75,11 +78,13 @@ export function MatchingBoard({ words, onComplete }: MatchingBoardProps) {
         setTimeout(() => onComplete(mistakes), 400);
       }
     } else {
-      // Wrong
+      // Wrong — highlight only the two chosen items, one per column
       setMistakes((m) => m + 1);
-      setWrong(new Set([termId, translationId]));
+      setWrongTerm(termId);
+      setWrongTranslation(translationId);
       setTimeout(() => {
-        setWrong(new Set());
+        setWrongTerm(null);
+        setWrongTranslation(null);
         setSelectedTerm(null);
         setSelectedTranslation(null);
       }, 700);
