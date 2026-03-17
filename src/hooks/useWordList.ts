@@ -37,5 +37,10 @@ export function useWordList(id: string) {
     setList(updated);
   }, [id]);
 
-  return { list, refresh, saveWords, addWord, updateWord, deleteWord };
+  const renameList = useCallback((name: string) => {
+    const updated = storage.updateWordList(id, { name });
+    setList(updated);
+  }, [id]);
+
+  return { list, refresh, saveWords, addWord, updateWord, deleteWord, renameList };
 }

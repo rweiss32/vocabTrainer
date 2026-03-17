@@ -3,6 +3,7 @@ import { useWordList } from '../hooks/useWordList';
 import { WordTable } from '../components/wordlist/WordTable';
 import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
+import { EditableTitle } from '../components/common/EditableTitle';
 
 interface ExerciseCardProps {
   to: string;
@@ -31,7 +32,7 @@ function ExerciseCard({ to, title, description, icon, disabled }: ExerciseCardPr
 
 export function ListDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { list } = useWordList(id!);
+  const { list, renameList } = useWordList(id!);
 
   if (!list) {
     return <div className="text-center py-16 text-gray-500">List not found.</div>;
@@ -44,7 +45,7 @@ export function ListDetailPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{list.name}</h1>
+          <EditableTitle value={list.name} onSave={renameList} />
           <p className="text-sm text-gray-500 mt-1">{list.words.length} word{list.words.length !== 1 ? 's' : ''}</p>
         </div>
         <Link to={`/list/${id}/edit`}>
