@@ -25,5 +25,11 @@ export function useWordLists() {
     setLists(storage.getWordLists());
   }, []);
 
-  return { lists, createList, deleteList, renameList, refresh };
+  const importLists = useCallback((newLists: WordList[]) => {
+    const current = storage.getWordLists();
+    storage.saveWordLists([...current, ...newLists]);
+    setLists(storage.getWordLists());
+  }, []);
+
+  return { lists, createList, deleteList, renameList, importLists, refresh };
 }
