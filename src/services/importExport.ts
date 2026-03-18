@@ -43,11 +43,20 @@ export function exportLists(lists: WordList[]): void {
 
 // --- Unified Import ---
 
+export interface RenameInfo { original: string; renamed: string; }
+
 export interface ImportAllResult {
   wordLists: WordList[];
   verbLists: VerbList[];
-  skippedWords: string[];
-  skippedVerbs: string[];
+  renamedWords: RenameInfo[];
+  renamedVerbs: RenameInfo[];
+}
+
+function uniqueName(name: string, existingSet: Set<string>): string {
+  if (!existingSet.has(name.toLowerCase())) return name;
+  let i = 2;
+  while (existingSet.has(`${name} (${i})`.toLowerCase())) i++;
+  return `${name} (${i})`;
 }
 
 export function parseImportAll(
@@ -70,40 +79,42 @@ export function parseImportAll(
   const verbNameSet = new Set(existingVerbNames.map((n) => n.toLowerCase()));
   const wordLists: WordList[] = [];
   const verbLists: VerbList[] = [];
-  const skippedWords: string[] = [];
-  const skippedVerbs: string[] = [];
+  const renamedWords: RenameInfo[] = [];
+  const renamedVerbs: RenameInfo[] = [];
 
   for (const raw of parsed.lists ?? []) {
     if (!raw.name || !Array.isArray(raw.words)) continue;
-    if (wordNameSet.has(raw.name.toLowerCase())) { skippedWords.push(raw.name); continue; }
+    const name = uniqueName(raw.name, wordNameSet);
+    if (name !== raw.name) renamedWords.push({ original: raw.name, renamed: name });
     wordLists.push({
       id: crypto.randomUUID(),
-      name: raw.name,
+      name,
       words: raw.words
         .filter((w) => w.term && w.translation)
         .map((w) => ({ id: crypto.randomUUID(), term: w.term, translation: w.translation })),
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-    wordNameSet.add(raw.name.toLowerCase());
+    wordNameSet.add(name.toLowerCase());
   }
 
   for (const raw of parsed.verbLists ?? []) {
     if (!raw.name || !Array.isArray(raw.verbs)) continue;
-    if (verbNameSet.has(raw.name.toLowerCase())) { skippedVerbs.push(raw.name); continue; }
+    const name = uniqueName(raw.name, verbNameSet);
+    if (name !== raw.name) renamedVerbs.push({ original: raw.name, renamed: name });
     verbLists.push({
       id: crypto.randomUUID(),
-      name: raw.name,
+      name,
       verbs: raw.verbs
         .filter((v) => v.v1 && v.v2 && v.v3)
         .map((v) => ({ id: crypto.randomUUID(), v1: v.v1, v2: v.v2, v3: v.v3, meaning: v.meaning })),
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-    verbNameSet.add(raw.name.toLowerCase());
+    verbNameSet.add(name.toLowerCase());
   }
 
-  return { wordLists, verbLists, skippedWords, skippedVerbs };
+  return { wordLists, verbLists, renamedWords, renamedVerbs };
 }
 
 function timestamp(): string {

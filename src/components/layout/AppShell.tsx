@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { parseImportAll } from '../../services/importExport';
 import * as storage from '../../services/storage';
 import { ExportAllModal } from '../common/ExportAllModal';
+import { ImportAllModal } from '../common/ImportAllModal';
 import type { WordList, VerbList } from '../../types';
 
 interface AppShellProps {
@@ -15,6 +16,7 @@ export function AppShell({ children }: AppShellProps) {
   const isSection = location.pathname === '/' || location.pathname === '/verbs';
   const importInputRef = useRef<HTMLInputElement>(null);
   const [exportData, setExportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[] } | null>(null);
+  const [importData, setImportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[]; renamedWords: { original: string; renamed: string }[]; renamedVerbs: { original: string; renamed: string }[] } | null>(null);
 
   function handleExportClick() {
     setExportData({ wordLists: storage.getWordLists(), verbLists: storage.getVerbLists() });
@@ -30,25 +32,24 @@ export function AppShell({ children }: AppShellProps) {
           storage.getWordLists().map((l) => l.name),
           storage.getVerbLists().map((l) => l.name),
         );
-        const total = result.wordLists.length + result.verbLists.length;
-        const skipped = result.skippedWords.length + result.skippedVerbs.length;
-        if (total === 0 && skipped === 0) {
+        if (result.wordLists.length === 0 && result.verbLists.length === 0) {
           alert('No valid lists found in the file.');
           return;
         }
-        storage.saveWordLists([...storage.getWordLists(), ...result.wordLists]);
-        storage.saveVerbLists([...storage.getVerbLists(), ...result.verbLists]);
-        const lines: string[] = [];
-        if (total > 0) lines.push(`Imported ${total} list${total !== 1 ? 's' : ''}.`);
-        if (skipped > 0) lines.push(`Skipped ${skipped} (already exist).`);
-        alert(lines.join('\n'));
-        window.location.reload();
+        setImportData(result);
       } catch (err) {
         alert(err instanceof Error ? err.message : 'Failed to import file.');
       }
       if (importInputRef.current) importInputRef.current.value = '';
     };
     reader.readAsText(file, 'UTF-8');
+  }
+
+  function handleImportConfirm(wordLists: WordList[], verbLists: VerbList[]) {
+    if (wordLists.length > 0) storage.saveWordLists([...storage.getWordLists(), ...wordLists]);
+    if (verbLists.length > 0) storage.saveVerbLists([...storage.getVerbLists(), ...verbLists]);
+    setImportData(null);
+    window.location.reload();
   }
 
   const backHref = inVerbs ? '/verbs' : '/';
@@ -125,6 +126,17 @@ export function AppShell({ children }: AppShellProps) {
           wordLists={exportData.wordLists}
           verbLists={exportData.verbLists}
           onClose={() => setExportData(null)}
+        />
+      )}
+
+      {importData && (
+        <ImportAllModal
+          wordLists={importData.wordLists}
+          verbLists={importData.verbLists}
+          renamedWords={importData.renamedWords}
+          renamedVerbs={importData.renamedVerbs}
+          onConfirm={handleImportConfirm}
+          onClose={() => setImportData(null)}
         />
       )}
     </div>
