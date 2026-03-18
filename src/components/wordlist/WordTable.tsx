@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import type { Word } from '../../types';
+import type { Word, ListStats } from '../../types';
 import { Button } from '../common/Button';
+import { StatDot } from '../common/StatDot';
 
 interface WordTableProps {
   words: Word[];
   editable?: boolean;
+  stats?: ListStats;
   onUpdate?: (id: string, field: 'term' | 'translation', value: string) => void;
   onDelete?: (id: string) => void;
 }
 
-export function WordTable({ words, editable = false, onUpdate, onDelete }: WordTableProps) {
+export function WordTable({ words, editable = false, stats, onUpdate, onDelete }: WordTableProps) {
+  const showStats = stats !== undefined;
   const [sortField, setSortField] = useState<'term' | 'translation'>('term');
   const [sortAsc, setSortAsc] = useState(true);
 
@@ -32,6 +35,7 @@ export function WordTable({ words, editable = false, onUpdate, onDelete }: WordT
       <table className="w-full text-sm">
         <thead className="bg-gray-50">
           <tr>
+            {showStats && <th className="px-3 py-3 w-8" />}
             <th
               className="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900 select-none"
               onClick={() => toggleSort('term')}
@@ -53,6 +57,8 @@ export function WordTable({ words, editable = false, onUpdate, onDelete }: WordT
               key={word.id}
               word={word}
               editable={editable}
+              showStats={showStats}
+              stat={stats?.[word.id]}
               onUpdate={onUpdate}
               onDelete={onDelete}
             />
@@ -66,11 +72,13 @@ export function WordTable({ words, editable = false, onUpdate, onDelete }: WordT
 interface WordRowProps {
   word: Word;
   editable: boolean;
+  showStats?: boolean;
+  stat?: import('../../types').ItemStat;
   onUpdate?: (id: string, field: 'term' | 'translation', value: string) => void;
   onDelete?: (id: string) => void;
 }
 
-function WordRow({ word, editable, onUpdate, onDelete }: WordRowProps) {
+function WordRow({ word, editable, showStats, stat, onUpdate, onDelete }: WordRowProps) {
   const [editingField, setEditingField] = useState<'term' | 'translation' | null>(null);
   const [value, setValue] = useState('');
 
@@ -91,6 +99,11 @@ function WordRow({ word, editable, onUpdate, onDelete }: WordRowProps) {
 
   return (
     <tr className="group">
+      {showStats && (
+        <td className="px-3 py-3 border-b border-gray-100 text-center">
+          <StatDot stat={stat} />
+        </td>
+      )}
       <td className={cellClass} onClick={() => startEdit('term')}>
         {editingField === 'term' ? (
           <input

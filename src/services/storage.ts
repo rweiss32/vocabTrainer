@@ -1,4 +1,4 @@
-import type { WordList, VerbList, AppSettings } from '../types';
+import type { WordList, VerbList, AppSettings, ListStats } from '../types';
 import { STORAGE_KEYS, DEFAULT_SETTINGS } from '../constants';
 
 // --- Word Lists ---
@@ -89,6 +89,36 @@ export function updateVerbList(id: string, data: Partial<Omit<VerbList, 'id' | '
 
 export function deleteVerbList(id: string): void {
   saveVerbLists(getVerbLists().filter((l) => l.id !== id));
+}
+
+// --- Stats ---
+
+export function getListStats(listId: string): ListStats {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.STATS_PREFIX + listId);
+    return raw ? (JSON.parse(raw) as ListStats) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveListStats(listId: string, stats: ListStats): void {
+  localStorage.setItem(STORAGE_KEYS.STATS_PREFIX + listId, JSON.stringify(stats));
+}
+
+export function recordAnswer(listId: string, itemId: string, correct: boolean): void {
+  const stats = getListStats(listId);
+  const existing = stats[itemId] ?? { correct: 0, incorrect: 0, lastSeen: 0 };
+  stats[itemId] = {
+    correct: existing.correct + (correct ? 1 : 0),
+    incorrect: existing.incorrect + (correct ? 0 : 1),
+    lastSeen: Date.now(),
+  };
+  saveListStats(listId, stats);
+}
+
+export function clearListStats(listId: string): void {
+  localStorage.removeItem(STORAGE_KEYS.STATS_PREFIX + listId);
 }
 
 // --- Settings ---

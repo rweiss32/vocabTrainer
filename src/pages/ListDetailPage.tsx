@@ -1,10 +1,12 @@
 import { Link, useParams } from 'react-router-dom';
 import { useWordList } from '../hooks/useWordList';
 import { useWordLists } from '../hooks/useWordLists';
+import { useListStats } from '../hooks/useListStats';
 import { WordTable } from '../components/wordlist/WordTable';
 import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
 import { EditableTitle } from '../components/common/EditableTitle';
+import { StatsSummaryBar } from '../components/common/StatsSummaryBar';
 import { exportLists } from '../services/importExport';
 
 interface ExerciseCardProps {
@@ -36,6 +38,7 @@ export function ListDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { list, renameList } = useWordList(id!);
   const { lists } = useWordLists();
+  const { stats } = useListStats(id!);
 
   if (!list) {
     return <div className="text-center py-16 text-gray-500">List not found.</div>;
@@ -122,7 +125,8 @@ export function ListDetailPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-semibold text-gray-800">Word list</h2>
-            <WordTable words={list.words} />
+            <StatsSummaryBar stats={stats} total={list.words.length} />
+            <WordTable words={list.words} stats={stats} />
           </section>
         </>
       )}

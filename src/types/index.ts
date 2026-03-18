@@ -32,3 +32,11 @@ export interface VerbList {
   createdAt: number;
   updatedAt: number;
 }
+
+export interface ItemStat {
+  correct: number;
+  incorrect: number;
+  lastSeen: number; // timestamp ms
+}
+
+export type ListStats = Record<string, ItemStat>; // keyed by word/verb id

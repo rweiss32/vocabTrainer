@@ -1,10 +1,12 @@
 import { Link, useParams } from 'react-router-dom';
 import { useVerbList } from '../hooks/useVerbList';
 import { useVerbLists } from '../hooks/useVerbLists';
+import { useListStats } from '../hooks/useListStats';
 import { VerbTable } from '../components/verblist/VerbTable';
 import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
 import { EditableTitle } from '../components/common/EditableTitle';
+import { StatsSummaryBar } from '../components/common/StatsSummaryBar';
 
 interface ExerciseCardProps {
   to: string;
@@ -35,6 +37,7 @@ export function VerbListDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { list, renameList } = useVerbList(id!);
   const { lists } = useVerbLists();
+  const { stats } = useListStats(id!);
 
   if (!list) {
     return <div className="text-center py-16 text-gray-500">List not found.</div>;
@@ -101,7 +104,8 @@ export function VerbListDetailPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-semibold text-gray-800">Verb list</h2>
-            <VerbTable verbs={list.verbs} />
+            <StatsSummaryBar stats={stats} total={list.verbs.length} />
+            <VerbTable verbs={list.verbs} stats={stats} />
           </section>
         </>
       )}

@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Verb } from '../../../types';
 import { VerbFlashcardCard } from './VerbFlashcardCard';
 import { Button } from '../../common/Button';
+import { recordAnswer } from '../../../services/storage';
 
 interface VerbFlashcardDeckProps {
   verbs: Verb[];
+  listId: string;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -16,7 +18,7 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export function VerbFlashcardDeck({ verbs }: VerbFlashcardDeckProps) {
+export function VerbFlashcardDeck({ verbs, listId }: VerbFlashcardDeckProps) {
   const [deck, setDeck] = useState<Verb[]>(() => [...verbs]);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -47,6 +49,11 @@ export function VerbFlashcardDeck({ verbs }: VerbFlashcardDeckProps) {
     setFlipped(false);
   }
 
+  function handleRate(correct: boolean) {
+    recordAnswer(listId, current.id, correct);
+    if (index < deck.length - 1) goTo(index + 1);
+  }
+
   return (
     <div className="flex flex-col items-center gap-6">
       <div className="w-full flex items-center gap-3">
@@ -64,6 +71,26 @@ export function VerbFlashcardDeck({ verbs }: VerbFlashcardDeckProps) {
         flipped={flipped}
         onClick={() => setFlipped((f) => !f)}
       />
+
+      {/* Thumbs (shown after flip) */}
+      {flipped && (
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => handleRate(false)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
+            title="I didn't know this"
+          >
+            👎 Still learning
+          </button>
+          <button
+            onClick={() => handleRate(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-green-200 text-green-600 hover:bg-green-50 transition-colors text-sm font-medium"
+            title="I knew this"
+          >
+            👍 Got it!
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center gap-3">
         <Button variant="secondary" onClick={prev} disabled={index === 0}>
@@ -86,7 +113,9 @@ export function VerbFlashcardDeck({ verbs }: VerbFlashcardDeckProps) {
         </Button>
       </div>
 
-      <p className="text-xs text-gray-400">Use ← → arrow keys to navigate, Space to flip</p>
+      <p className="text-xs text-gray-400">
+        {flipped ? 'Rate yourself, or use ← → to navigate' : 'Use ← → arrow keys to navigate, Space to flip'}
+      </p>
     </div>
   );
 }

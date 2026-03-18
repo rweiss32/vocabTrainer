@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import type { Verb } from '../../types';
+import type { Verb, ListStats } from '../../types';
 import { Button } from '../common/Button';
+import { StatDot } from '../common/StatDot';
 
 interface VerbTableProps {
   verbs: Verb[];
   editable?: boolean;
+  stats?: ListStats;
   onUpdate?: (verbId: string, field: keyof Omit<Verb, 'id'>, value: string) => void;
   onDelete?: (verbId: string) => void;
 }
 
-export function VerbTable({ verbs, editable = false, onUpdate, onDelete }: VerbTableProps) {
+export function VerbTable({ verbs, editable = false, stats, onUpdate, onDelete }: VerbTableProps) {
+  const showStats = stats !== undefined;
   if (verbs.length === 0) {
     return <p className="text-sm text-gray-400 text-center py-8">No verbs yet.</p>;
   }
@@ -19,6 +22,7 @@ export function VerbTable({ verbs, editable = false, onUpdate, onDelete }: VerbT
       <table className="w-full text-sm">
         <thead className="bg-gray-50">
           <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {showStats && <th className="px-3 py-3 w-8" />}
             <th className="px-4 py-3">V1 — Base</th>
             <th className="px-4 py-3">V2 — Past simple</th>
             <th className="px-4 py-3">V3 — Past participle</th>
@@ -32,6 +36,8 @@ export function VerbTable({ verbs, editable = false, onUpdate, onDelete }: VerbT
               key={verb.id}
               verb={verb}
               editable={editable}
+              showStats={showStats}
+              stat={stats?.[verb.id]}
               onUpdate={onUpdate}
               onDelete={onDelete}
             />
@@ -47,11 +53,13 @@ type EditableField = 'v1' | 'v2' | 'v3' | 'meaning';
 interface VerbRowProps {
   verb: Verb;
   editable: boolean;
+  showStats?: boolean;
+  stat?: import('../../types').ItemStat;
   onUpdate?: (verbId: string, field: keyof Omit<Verb, 'id'>, value: string) => void;
   onDelete?: (verbId: string) => void;
 }
 
-function VerbRow({ verb, editable, onUpdate, onDelete }: VerbRowProps) {
+function VerbRow({ verb, editable, showStats, stat, onUpdate, onDelete }: VerbRowProps) {
   const [editingField, setEditingField] = useState<EditableField | null>(null);
   const [value, setValue] = useState('');
 
@@ -101,6 +109,11 @@ function VerbRow({ verb, editable, onUpdate, onDelete }: VerbRowProps) {
 
   return (
     <tr className="group">
+      {showStats && (
+        <td className="px-3 py-3 border-b border-gray-100 text-center">
+          <StatDot stat={stat} />
+        </td>
+      )}
       {renderCell('v1', verb.v1, 'text-gray-900 font-medium')}
       {renderCell('v2', verb.v2)}
       {renderCell('v3', verb.v3)}

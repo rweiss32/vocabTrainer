@@ -55,7 +55,7 @@ export function MatchingPage() {
       ) : (
         <>
           <p className="text-sm text-gray-500">Click a word on the left, then its translation on the right.</p>
-          <MatchingBoard key={key} words={list.words} onComplete={handleComplete} />
+          <MatchingBoard key={key} words={list.words} listId={id!} onComplete={handleComplete} />
         </>
       )}
     </div>

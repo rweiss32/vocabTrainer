@@ -23,7 +23,7 @@ export function FlashcardPage() {
           <Button variant="secondary">Back</Button>
         </Link>
       </div>
-      <FlashcardDeck words={list.words} />
+      <FlashcardDeck words={list.words} listId={id!} />
     </div>
   );
 }

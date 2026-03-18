@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Word } from '../../../types';
 import { FlashcardCard } from './FlashcardCard';
 import { Button } from '../../common/Button';
+import { recordAnswer } from '../../../services/storage';
 
 interface FlashcardDeckProps {
   words: Word[];
+  listId: string;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -16,12 +18,11 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export function FlashcardDeck({ words }: FlashcardDeckProps) {
+export function FlashcardDeck({ words, listId }: FlashcardDeckProps) {
   const [deck, setDeck] = useState<Word[]>(() => [...words]);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [showTranslationFirst, setShowTranslationFirst] = useState(false);
-
   const current = deck[index];
 
   const goTo = useCallback((i: number) => {
@@ -48,6 +49,11 @@ export function FlashcardDeck({ words }: FlashcardDeckProps) {
     setFlipped(false);
   }
 
+  function handleRate(correct: boolean) {
+    recordAnswer(listId, current.id, correct);
+    if (index < deck.length - 1) goTo(index + 1);
+  }
+
   return (
     <div className="flex flex-col items-center gap-6">
       {/* Progress */}
@@ -68,6 +74,26 @@ export function FlashcardDeck({ words }: FlashcardDeckProps) {
         showTranslationFirst={showTranslationFirst}
         onClick={() => setFlipped((f) => !f)}
       />
+
+      {/* Thumbs (shown after flip) */}
+      {flipped && (
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => handleRate(false)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
+            title="I didn't know this"
+          >
+            👎 Still learning
+          </button>
+          <button
+            onClick={() => handleRate(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-green-200 text-green-600 hover:bg-green-50 transition-colors text-sm font-medium"
+            title="I knew this"
+          >
+            👍 Got it!
+          </button>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="flex items-center gap-3">
@@ -101,7 +127,9 @@ export function FlashcardDeck({ words }: FlashcardDeckProps) {
         </Button>
       </div>
 
-      <p className="text-xs text-gray-400">Use ← → arrow keys to navigate, Space to flip</p>
+      <p className="text-xs text-gray-400">
+        {flipped ? 'Rate yourself, or use ← → to navigate' : 'Use ← → arrow keys to navigate, Space to flip'}
+      </p>
     </div>
   );
 }

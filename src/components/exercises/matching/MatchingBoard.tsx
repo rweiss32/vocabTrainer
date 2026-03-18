@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
 import type { Word } from '../../../types';
 import { MAX_MATCHING_PAIRS } from '../../../constants';
+import { recordAnswer } from '../../../services/storage';
 
 interface MatchingBoardProps {
   words: Word[];
+  listId: string;
   onComplete: (mistakes: number) => void;
 }
 
@@ -18,7 +20,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 type ItemState = 'idle' | 'selected' | 'correct' | 'wrong';
 
-export function MatchingBoard({ words, onComplete }: MatchingBoardProps) {
+export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps) {
   const pairs = useMemo(() => {
     const subset = shuffle(words).slice(0, MAX_MATCHING_PAIRS);
     return subset;
@@ -69,6 +71,7 @@ export function MatchingBoard({ words, onComplete }: MatchingBoardProps) {
   function checkMatch(termId: string, translationId: string) {
     if (termId === translationId) {
       // Correct!
+      recordAnswer(listId, termId, true);
       const newMatched = new Set(matched);
       newMatched.add(termId);
       setMatched(newMatched);

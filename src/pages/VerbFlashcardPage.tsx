@@ -23,7 +23,7 @@ export function VerbFlashcardPage() {
           <Button variant="secondary">Back</Button>
         </Link>
       </div>
-      <VerbFlashcardDeck verbs={list.verbs} />
+      <VerbFlashcardDeck verbs={list.verbs} listId={id!} />
     </div>
   );
 }
