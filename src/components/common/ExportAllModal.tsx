@@ -3,6 +3,7 @@ import type { WordList, VerbList } from '../../types';
 import { exportAll } from '../../services/importExport';
 import { Modal } from './Modal';
 import { Button } from './Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface ExportAllModalProps {
   wordLists: WordList[];
@@ -11,6 +12,7 @@ interface ExportAllModalProps {
 }
 
 export function ExportAllModal({ wordLists, verbLists, onClose }: ExportAllModalProps) {
+  const { t } = useLanguage();
   const [selectedWords, setSelectedWords] = useState<Set<string>>(new Set(wordLists.map((l) => l.id)));
   const [selectedVerbs, setSelectedVerbs] = useState<Set<string>>(new Set(verbLists.map((l) => l.id)));
 
@@ -46,19 +48,19 @@ export function ExportAllModal({ wordLists, verbLists, onClose }: ExportAllModal
 
   return (
     <Modal
-      title="Export"
+      title={t('common.export')}
       onClose={onClose}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
           <Button onClick={handleExport} disabled={totalSelected === 0}>
-            Export {totalSelected > 0 ? `(${totalSelected})` : ''}
+            {t('common.export')}{totalSelected > 0 ? ` (${totalSelected})` : ''}
           </Button>
         </>
       }
     >
       <div className="space-y-3">
-        <p className="text-sm text-gray-500">Select the lists to include in the export file.</p>
+        <p className="text-sm text-gray-500">{t('modal.export.description')}</p>
 
         {totalAll > 1 && (
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
@@ -68,14 +70,14 @@ export function ExportAllModal({ wordLists, verbLists, onClose }: ExportAllModal
               onChange={toggleAll}
               className="rounded border-gray-300 text-indigo-600"
             />
-            Select all
+            {t('modal.export.selectAll')}
           </label>
         )}
 
         <div className="border-t pt-2 space-y-4 max-h-72 overflow-y-auto">
           {wordLists.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Word lists</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('modal.export.wordLists')}</p>
               {wordLists.map((list) => (
                 <label key={list.id} className="flex items-center gap-2 text-sm text-gray-800 cursor-pointer select-none">
                   <input
@@ -85,7 +87,7 @@ export function ExportAllModal({ wordLists, verbLists, onClose }: ExportAllModal
                     className="rounded border-gray-300 text-indigo-600"
                   />
                   <span className="flex-1 truncate">{list.name}</span>
-                  <span className="text-gray-400 shrink-0">{list.words.length} words</span>
+                  <span className="text-gray-400 shrink-0">{list.words.length === 1 ? t('count.words', { n: list.words.length }) : t('count.words_plural', { n: list.words.length })}</span>
                 </label>
               ))}
             </div>
@@ -93,7 +95,7 @@ export function ExportAllModal({ wordLists, verbLists, onClose }: ExportAllModal
 
           {verbLists.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Verb lists</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('modal.export.verbLists')}</p>
               {verbLists.map((list) => (
                 <label key={list.id} className="flex items-center gap-2 text-sm text-gray-800 cursor-pointer select-none">
                   <input
@@ -103,7 +105,7 @@ export function ExportAllModal({ wordLists, verbLists, onClose }: ExportAllModal
                     className="rounded border-gray-300 text-indigo-600"
                   />
                   <span className="flex-1 truncate">{list.name}</span>
-                  <span className="text-gray-400 shrink-0">{list.verbs.length} verbs</span>
+                  <span className="text-gray-400 shrink-0">{list.verbs.length === 1 ? t('count.verbs', { n: list.verbs.length }) : t('count.verbs_plural', { n: list.verbs.length })}</span>
                 </label>
               ))}
             </div>

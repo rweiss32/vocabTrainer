@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Verb } from '../../../types';
 import { Button } from '../../common/Button';
+import { useLanguage } from '../../../lang/LanguageContext';
 
 interface VerbTypingQuestionProps {
   verb: Verb;
@@ -10,6 +11,7 @@ interface VerbTypingQuestionProps {
 }
 
 export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: VerbTypingQuestionProps) {
+  const { t } = useLanguage();
   const [v2Input, setV2Input] = useState('');
   const [v3Input, setV3Input] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -45,11 +47,11 @@ export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: Ve
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-8 space-y-6">
       <div className="flex justify-between text-sm text-gray-400">
-        <span>Question {questionNumber} of {total}</span>
+        <span>{t('typing.q.questionOf', { n: questionNumber, total })}</span>
       </div>
 
       <div className="text-center space-y-2">
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">V1 — Base form</p>
+        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{t('verbTyping.q.v1Label')}</p>
         <p className="text-4xl font-bold text-gray-900">{verb.v1}</p>
         {verb.meaning && (
           <p className="text-sm text-gray-400">{verb.meaning}</p>
@@ -58,11 +60,11 @@ export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: Ve
 
       <div className="space-y-4">
         <div className="space-y-1">
-          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">V2 — Past simple</label>
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t('verbTyping.q.v2Label')}</label>
           <input
             ref={v2Ref}
             type="text"
-            placeholder="Type V2..."
+            placeholder={t('verbTyping.q.v2Placeholder')}
             className={`w-full border-2 rounded-xl px-4 py-3 text-lg outline-none transition-colors ${inputClass(v2Correct)}`}
             value={v2Input}
             onChange={(e) => !submitted && setV2Input(e.target.value)}
@@ -71,16 +73,16 @@ export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: Ve
           />
           {submitted && !v2Correct && (
             <p className="text-sm text-gray-600">
-              Correct: <span className="font-semibold text-gray-900">{verb.v2}</span>
+              {t('verbTyping.q.correctAnswer')} <span className="font-semibold text-gray-900">{verb.v2}</span>
             </p>
           )}
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">V3 — Past participle</label>
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t('verbTyping.q.v3Label')}</label>
           <input
             type="text"
-            placeholder="Type V3..."
+            placeholder={t('verbTyping.q.v3Placeholder')}
             className={`w-full border-2 rounded-xl px-4 py-3 text-lg outline-none transition-colors ${inputClass(v3Correct)}`}
             value={v3Input}
             onChange={(e) => !submitted && setV3Input(e.target.value)}
@@ -89,22 +91,22 @@ export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: Ve
           />
           {submitted && !v3Correct && (
             <p className="text-sm text-gray-600">
-              Correct: <span className="font-semibold text-gray-900">{verb.v3}</span>
+              {t('verbTyping.q.correctAnswer')} <span className="font-semibold text-gray-900">{verb.v3}</span>
             </p>
           )}
         </div>
 
         {submitted && v2Correct && v3Correct && (
-          <p className="text-sm text-green-600 font-medium">Correct!</p>
+          <p className="text-sm text-green-600 font-medium">{t('verbTyping.q.correct')}</p>
         )}
       </div>
 
       <div className="flex justify-end">
         {!submitted ? (
-          <Button onClick={handleSubmit} disabled={!v2Input.trim() || !v3Input.trim()}>Check</Button>
+          <Button onClick={handleSubmit} disabled={!v2Input.trim() || !v3Input.trim()}>{t('typing.q.check')}</Button>
         ) : (
           <Button onClick={handleNext}>
-            {questionNumber < total ? 'Next' : 'See results'}
+            {questionNumber < total ? t('typing.q.next') : t('typing.q.seeResults')}
           </Button>
         )}
       </div>

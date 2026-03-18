@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import type { Word } from '../../../types';
 import { MAX_MATCHING_PAIRS } from '../../../constants';
 import { recordAnswer } from '../../../services/storage';
+import { useLanguage } from '../../../lang/LanguageContext';
 
 interface MatchingBoardProps {
   words: Word[];
@@ -21,6 +22,7 @@ function shuffle<T>(arr: T[]): T[] {
 type ItemState = 'idle' | 'selected' | 'correct' | 'wrong';
 
 export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps) {
+  const { t } = useLanguage();
   const pairs = useMemo(() => {
     const subset = shuffle(words).slice(0, MAX_MATCHING_PAIRS);
     return subset;
@@ -104,13 +106,13 @@ export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps)
   return (
     <div className="space-y-4">
       <div className="flex justify-between text-sm text-gray-500">
-        <span>{matched.size} / {pairs.length} matched</span>
-        <span>{mistakes > 0 ? `${mistakes} mistake${mistakes !== 1 ? 's' : ''}` : 'No mistakes yet'}</span>
+        <span>{matched.size} / {pairs.length} {t('matching.matched')}</span>
+        <span>{mistakes > 0 ? `${mistakes} ${mistakes !== 1 ? t('matching.mistakes') : t('matching.mistake')}` : t('matching.noMistakes')}</span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider text-center">English</p>
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider text-center">{t('matching.english')}</p>
           {terms.map((id) => (
             <button
               key={id}
@@ -123,7 +125,7 @@ export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps)
           ))}
         </div>
         <div className="space-y-2">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider text-center">Translation</p>
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider text-center">{t('matching.translation')}</p>
           {translations.map((id) => (
             <button
               key={id}

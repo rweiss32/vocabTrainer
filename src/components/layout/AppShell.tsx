@@ -4,6 +4,7 @@ import { parseImportAll } from '../../services/importExport';
 import * as storage from '../../services/storage';
 import { ExportAllModal } from '../common/ExportAllModal';
 import { ImportAllModal } from '../common/ImportAllModal';
+import { useLanguage } from '../../lang/LanguageContext';
 import type { WordList, VerbList } from '../../types';
 
 interface AppShellProps {
@@ -11,6 +12,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps) {
+  const { lang, toggleLang, t } = useLanguage();
   const location = useLocation();
   const inVerbs = location.pathname.startsWith('/verbs');
   const isSection = location.pathname === '/' || location.pathname === '/verbs';
@@ -53,7 +55,7 @@ export function AppShell({ children }: AppShellProps) {
   }
 
   const backHref = inVerbs ? '/verbs' : '/';
-  const backLabel = inVerbs ? 'All verb lists' : 'All lists';
+  const backLabel = inVerbs ? t('nav.allVerbLists') : t('nav.allLists');
 
   function navTabClass(active: boolean) {
     return `text-sm font-medium px-3 py-1 rounded-full transition-colors ${
@@ -76,11 +78,20 @@ export function AppShell({ children }: AppShellProps) {
           <span className="text-xs text-gray-400 font-normal">v{__APP_VERSION__}</span>
 
           <div className="flex items-center gap-1 ml-2">
-            <Link to="/" className={navTabClass(!inVerbs)}>Vocabulary</Link>
-            <Link to="/verbs" className={navTabClass(inVerbs)}>Verb Forms</Link>
+            <Link to="/" className={navTabClass(!inVerbs)}>{t('nav.vocabulary')}</Link>
+            <Link to="/verbs" className={navTabClass(inVerbs)}>{t('nav.verbForms')}</Link>
           </div>
 
           <div className="ml-auto flex items-center gap-1">
+            {/* Language toggle */}
+            <button
+              onClick={toggleLang}
+              title={lang === 'he' ? 'Switch to English' : 'עבור לעברית'}
+              className="p-2 text-xs font-bold text-gray-500 hover:text-indigo-600 hover:bg-gray-100 rounded-lg transition-colors w-9 h-9 flex items-center justify-center"
+            >
+              {lang === 'he' ? 'EN' : 'עב'}
+            </button>
+
             <input
               ref={importInputRef}
               type="file"
@@ -90,7 +101,7 @@ export function AppShell({ children }: AppShellProps) {
             />
             <button
               onClick={() => importInputRef.current?.click()}
-              title="Import"
+              title={t('common.import')}
               className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,7 +110,7 @@ export function AppShell({ children }: AppShellProps) {
             </button>
             <button
               onClick={handleExportClick}
-              title="Export"
+              title={t('common.export')}
               className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

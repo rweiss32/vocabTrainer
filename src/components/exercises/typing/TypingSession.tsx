@@ -5,6 +5,7 @@ import { Button } from '../../common/Button';
 import { Link } from 'react-router-dom';
 import { useListStats } from '../../../hooks/useListStats';
 import { getStatColor } from '../../common/StatDot';
+import { useLanguage } from '../../../lang/LanguageContext';
 
 interface TypingSessionProps {
   words: Word[];
@@ -21,6 +22,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function TypingSession({ words, listId }: TypingSessionProps) {
+  const { t } = useLanguage();
   const { stats, recordAnswer, refresh } = useListStats(listId);
   const [weakOnly, setWeakOnly] = useState(false);
 
@@ -72,12 +74,12 @@ export function TypingSession({ words, listId }: TypingSessionProps) {
     return (
       <div className="bg-white rounded-2xl border border-gray-200 p-10 text-center space-y-4 max-w-md mx-auto">
         <div className="text-5xl">{percent === 100 ? '🎉' : percent >= 70 ? '👍' : '📚'}</div>
-        <h2 className="text-xl font-bold text-gray-900">Session complete!</h2>
+        <h2 className="text-xl font-bold text-gray-900">{t('typing.done.title')}</h2>
         <p className="text-3xl font-bold text-indigo-600">{score} / {deck.length}</p>
-        <p className="text-gray-500">{percent}% correct</p>
+        <p className="text-gray-500">{percent}{t('typing.done.correct')}</p>
         <div className="flex justify-center gap-3 pt-2">
-          <Button onClick={() => restart()}>Try again</Button>
-          <Link to={`/list/${listId}`}><Button variant="secondary">Back to list</Button></Link>
+          <Button onClick={() => restart()}>{t('typing.done.tryAgain')}</Button>
+          <Link to={`/list/${listId}`}><Button variant="secondary">{t('typing.done.backToList')}</Button></Link>
         </div>
       </div>
     );
@@ -103,7 +105,7 @@ export function TypingSession({ words, listId }: TypingSessionProps) {
                 : 'bg-white border-gray-300 text-gray-500 hover:border-amber-300 hover:text-amber-600'
             }`}
           >
-            {weakOnly ? '⚡ Weak words' : 'All words'}
+            {weakOnly ? t('typing.weakWords') : t('typing.allWords')}
           </button>
         )}
       </div>

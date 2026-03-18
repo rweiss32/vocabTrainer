@@ -1,5 +1,6 @@
 import type { ListStats } from '../../types';
 import { getStatColor } from './StatDot';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface StatsSummaryBarProps {
   stats: ListStats;
@@ -7,6 +8,7 @@ interface StatsSummaryBarProps {
 }
 
 export function StatsSummaryBar({ stats, total }: StatsSummaryBarProps) {
+  const { t } = useLanguage();
   const entries = Object.values(stats);
   const seen = entries.length;
   if (seen === 0) return null;
@@ -21,25 +23,25 @@ export function StatsSummaryBar({ stats, total }: StatsSummaryBarProps) {
       {mastered > 0 && (
         <span className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-green-400 inline-block" />
-          <span>{mastered} mastered</span>
+          <span>{mastered} {t('stats.mastered')}</span>
         </span>
       )}
       {learning > 0 && (
         <span className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 inline-block" />
-          <span>{learning} learning</span>
+          <span>{learning} {t('stats.learning')}</span>
         </span>
       )}
       {struggling > 0 && (
         <span className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block" />
-          <span>{struggling} needs practice</span>
+          <span>{struggling} {t('stats.needsPractice')}</span>
         </span>
       )}
       {unseen > 0 && (
         <span className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-gray-300 inline-block" />
-          <span>{unseen} not yet practiced</span>
+          <span>{unseen} {t('stats.notYetPracticed')}</span>
         </span>
       )}
     </div>

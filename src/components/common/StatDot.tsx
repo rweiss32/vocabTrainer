@@ -1,4 +1,5 @@
 import type { ItemStat } from '../../types';
+import { useLanguage } from '../../lang/LanguageContext';
 
 export type StatColor = 'green' | 'yellow' | 'red' | 'gray';
 
@@ -38,12 +39,19 @@ interface StatDotProps {
   stat?: ItemStat;
 }
 
+const statDotKey = {
+  green: 'statDot.mastered',
+  yellow: 'statDot.learning',
+  red: 'statDot.needsPractice',
+  gray: 'statDot.notYetPracticed',
+} as const;
+
 export function StatDot({ stat }: StatDotProps) {
+  const { t } = useLanguage();
   const color = getStatColor(stat);
   const { correct, total } = statCounts(stat);
-  const title = total === 0
-    ? 'Not yet practiced'
-    : `${correct}/${total} correct (last ${total} attempt${total !== 1 ? 's' : ''})`;
+  const label = t(statDotKey[color]);
+  const title = total === 0 ? label : `${label} (${correct}/${total})`;
 
   if (total === 0) {
     return <span className="w-2.5 h-2.5 rounded-full bg-gray-300 inline-block" title={title} />;

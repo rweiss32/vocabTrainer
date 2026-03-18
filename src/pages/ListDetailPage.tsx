@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useWordList } from '../hooks/useWordList';
 import { useWordLists } from '../hooks/useWordLists';
 import { useListStats } from '../hooks/useListStats';
+import { useLanguage } from '../lang/LanguageContext';
 import { WordTable } from '../components/wordlist/WordTable';
 import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
@@ -29,44 +30,46 @@ function ExerciseCard({ to, title, description, icon, disabled }: ExerciseCardPr
       </div>
     </div>
   );
-
   if (disabled) return content;
   return <Link to={to}>{content}</Link>;
 }
 
 export function ListDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { t } = useLanguage();
   const { list, renameList } = useWordList(id!);
   const { lists } = useWordLists();
   const { stats } = useListStats(id!);
 
   if (!list) {
-    return <div className="text-center py-16 text-gray-500">List not found.</div>;
+    return <div className="text-center py-16 text-gray-500">{t('common.listNotFound')}</div>;
   }
 
   const hasWords = list.words.length > 0;
   const hasEnoughForMatching = list.words.length >= 2;
+  const wordCount = list.words.length;
+  const wordLabel = wordCount === 1 ? t('count.words', { n: wordCount }) : t('count.words_plural', { n: wordCount });
 
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <EditableTitle value={list.name} onSave={renameList} existingNames={lists.map((l) => l.name)} />
-          <p className="text-sm text-gray-500 mt-1">{list.words.length} word{list.words.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-gray-500 mt-1">{wordLabel}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => exportLists([list])}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Export
+            {t('listDetail.export')}
           </Button>
           <Link to={`/list/${id}/edit`}>
             <Button variant="secondary">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
-              Edit list
+              {t('listDetail.editList')}
             </Button>
           </Link>
         </div>
@@ -74,23 +77,23 @@ export function ListDetailPage() {
 
       {!hasWords ? (
         <EmptyState
-          title="No words in this list"
-          description="Add words to start practising."
+          title={t('listDetail.noWords.title')}
+          description={t('listDetail.noWords.description')}
           action={
             <Link to={`/list/${id}/edit`}>
-              <Button>Add words</Button>
+              <Button>{t('listDetail.addWords')}</Button>
             </Link>
           }
         />
       ) : (
         <>
           <section className="space-y-3">
-            <h2 className="text-base font-semibold text-gray-800">Exercises</h2>
+            <h2 className="text-base font-semibold text-gray-800">{t('listDetail.exercises')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <ExerciseCard
                 to={`/list/${id}/exercise/flashcard`}
-                title="Flashcards"
-                description="Flip cards to reveal translations"
+                title={t('exercise.flashcards')}
+                description={t('exercise.flashcards.desc')}
                 disabled={!hasWords}
                 icon={
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,8 +103,8 @@ export function ListDetailPage() {
               />
               <ExerciseCard
                 to={`/list/${id}/exercise/matching`}
-                title="Matching"
-                description="Connect words to their translations"
+                title={t('exercise.matching')}
+                description={t('exercise.matching.desc')}
                 disabled={!hasEnoughForMatching}
                 icon={
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,8 +114,8 @@ export function ListDetailPage() {
               />
               <ExerciseCard
                 to={`/list/${id}/exercise/typing`}
-                title="Typing"
-                description="See the translation, type the English term"
+                title={t('exercise.typing')}
+                description={t('exercise.typing.desc')}
                 disabled={!hasWords}
                 icon={
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,7 +127,7 @@ export function ListDetailPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-semibold text-gray-800">Word list</h2>
+            <h2 className="text-base font-semibold text-gray-800">{t('listDetail.wordList')}</h2>
             <StatsSummaryBar stats={stats} total={list.words.length} />
             <WordTable words={list.words} stats={stats} />
           </section>

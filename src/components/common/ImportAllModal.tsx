@@ -3,6 +3,7 @@ import type { WordList, VerbList } from '../../types';
 import type { RenameInfo } from '../../services/importExport';
 import { Modal } from './Modal';
 import { Button } from './Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface ImportAllModalProps {
   wordLists: WordList[];
@@ -14,6 +15,7 @@ interface ImportAllModalProps {
 }
 
 export function ImportAllModal({ wordLists, verbLists, renamedWords, renamedVerbs, onConfirm, onClose }: ImportAllModalProps) {
+  const { t } = useLanguage();
   const [selectedWords, setSelectedWords] = useState<Set<string>>(new Set(wordLists.map((l) => l.id)));
   const [selectedVerbs, setSelectedVerbs] = useState<Set<string>>(new Set(verbLists.map((l) => l.id)));
 
@@ -57,23 +59,23 @@ export function ImportAllModal({ wordLists, verbLists, renamedWords, renamedVerb
 
   return (
     <Modal
-      title="Import"
+      title={t('common.import')}
       onClose={onClose}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
           <Button onClick={handleImport} disabled={totalSelected === 0}>
-            Import {totalSelected > 0 ? `(${totalSelected})` : ''}
+            {t('common.import')}{totalSelected > 0 ? ` (${totalSelected})` : ''}
           </Button>
         </>
       }
     >
       <div className="space-y-3">
         {totalAll === 0 ? (
-          <p className="text-sm text-gray-500">No lists found in the file.</p>
+          <p className="text-sm text-gray-500">{t('modal.import.noLists')}</p>
         ) : (
           <>
-            <p className="text-sm text-gray-500">Select the lists to import.</p>
+            <p className="text-sm text-gray-500">{t('modal.import.description')}</p>
 
             {totalAll > 1 && (
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
@@ -83,14 +85,14 @@ export function ImportAllModal({ wordLists, verbLists, renamedWords, renamedVerb
                   onChange={toggleAll}
                   className="rounded border-gray-300 text-indigo-600"
                 />
-                Select all
+                {t('modal.export.selectAll')}
               </label>
             )}
 
             <div className="border-t pt-2 space-y-4 max-h-72 overflow-y-auto">
               {wordLists.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Word lists</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('modal.import.wordLists')}</p>
                   {wordLists.map((list) => {
                     const original = renamedWordMap.get(list.id);
                     return (
@@ -106,7 +108,7 @@ export function ImportAllModal({ wordLists, verbLists, renamedWords, renamedVerb
                             <><span className="text-gray-400 line-through">{original}</span>{' '}<span className="text-amber-600">→ {list.name}</span></>
                           ) : list.name}
                         </span>
-                        <span className="text-gray-400 shrink-0">{list.words.length} words</span>
+                        <span className="text-gray-400 shrink-0">{list.words.length === 1 ? t('count.words', { n: list.words.length }) : t('count.words_plural', { n: list.words.length })}</span>
                       </label>
                     );
                   })}
@@ -115,7 +117,7 @@ export function ImportAllModal({ wordLists, verbLists, renamedWords, renamedVerb
 
               {verbLists.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Verb lists</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('modal.import.verbLists')}</p>
                   {verbLists.map((list) => {
                     const original = renamedVerbMap.get(list.id);
                     return (
@@ -131,7 +133,7 @@ export function ImportAllModal({ wordLists, verbLists, renamedWords, renamedVerb
                             <><span className="text-gray-400 line-through">{original}</span>{' '}<span className="text-amber-600">→ {list.name}</span></>
                           ) : list.name}
                         </span>
-                        <span className="text-gray-400 shrink-0">{list.verbs.length} verbs</span>
+                        <span className="text-gray-400 shrink-0">{list.verbs.length === 1 ? t('count.verbs', { n: list.verbs.length }) : t('count.verbs_plural', { n: list.verbs.length })}</span>
                       </label>
                     );
                   })}
@@ -143,7 +145,7 @@ export function ImportAllModal({ wordLists, verbLists, renamedWords, renamedVerb
 
         {allRenamed.length > 0 && (
           <p className="text-xs text-amber-600 border-t pt-2">
-            {allRenamed.length} list{allRenamed.length !== 1 ? 's' : ''} renamed due to name conflict.
+            {allRenamed.length === 1 ? t('modal.import.renamed', { n: allRenamed.length }) : t('modal.import.renamed_plural', { n: allRenamed.length })}
           </p>
         )}
       </div>

@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useVerbList } from '../hooks/useVerbList';
 import { useVerbLists } from '../hooks/useVerbLists';
+import { useLanguage } from '../lang/LanguageContext';
 import { VerbTable } from '../components/verblist/VerbTable';
 import { AddVerbForm } from '../components/verblist/AddVerbForm';
 import { VerbImageUpload } from '../components/verblist/VerbImageUpload';
@@ -12,11 +13,12 @@ import type { Verb } from '../types';
 export function EditVerbListPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { list, addVerb, updateVerb, deleteVerb, saveVerbs, renameList } = useVerbList(id!);
   const { lists } = useVerbLists();
 
   if (!list) {
-    return <div className="text-center py-16 text-gray-500">List not found.</div>;
+    return <div className="text-center py-16 text-gray-500">{t('common.listNotFound')}</div>;
   }
 
   function handleImageImport(imported: Verb[]) {
@@ -28,45 +30,40 @@ export function EditVerbListPage() {
     if (skipped > 0) alert(`Imported ${newVerbs.length} verbs. ${skipped} duplicate(s) skipped.`);
   }
 
+  const verbCount = list.verbs.length;
+  const verbLabel = verbCount === 1 ? t('count.verbs', { n: verbCount }) : t('count.verbs_plural', { n: verbCount });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <EditableTitle value={list.name} onSave={renameList} existingNames={lists.map((l) => l.name)} />
-          <p className="text-sm text-gray-500 mt-1">{list.verbs.length} verb{list.verbs.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-gray-500 mt-1">{verbLabel}</p>
         </div>
         <Button variant="secondary" onClick={() => navigate(`/verbs/${id}`)}>
-          Done
+          {t('editVerb.done')}
         </Button>
       </div>
 
       <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">Add verb</h2>
+        <h2 className="text-base font-semibold text-gray-800">{t('editVerb.addVerb')}</h2>
         <AddVerbForm onAdd={addVerb} />
       </section>
 
       <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">Import from file</h2>
-        <p className="text-sm text-gray-500">
-          Upload a TSV or CSV file with columns: <code className="bg-gray-100 px-1 rounded">v1, v2, v3, translation</code>.
-          Duplicates (same V1) are skipped automatically.
-        </p>
+        <h2 className="text-base font-semibold text-gray-800">{t('editVerb.importFile')}</h2>
         <VerbFileUpload onImport={handleImageImport} />
       </section>
 
       <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">Import from image</h2>
-        <p className="text-sm text-gray-500">
-          Upload a photo with verb forms. Works best with lines like <code className="bg-gray-100 px-1 rounded">go / went / gone</code>.
-          Missing V2/V3 are suggested from the built-in table or flagged for manual entry.
-        </p>
+        <h2 className="text-base font-semibold text-gray-800">{t('editVerb.importImage')}</h2>
         <VerbImageUpload onImport={handleImageImport} />
       </section>
 
       {list.verbs.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-base font-semibold text-gray-800">Verbs ({list.verbs.length})</h2>
-          <p className="text-xs text-gray-400">Click any cell to edit. Hover a row to reveal the delete button.</p>
+          <h2 className="text-base font-semibold text-gray-800">{t('editVerb.verbs')} ({list.verbs.length})</h2>
+          <p className="text-xs text-gray-400">{t('editVerb.clickToEdit')}</p>
           <VerbTable
             verbs={list.verbs}
             editable

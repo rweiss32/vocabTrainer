@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Word } from '../../../types';
 import { Button } from '../../common/Button';
+import { useLanguage } from '../../../lang/LanguageContext';
 
 interface TypingQuestionProps {
   word: Word;
@@ -10,6 +11,7 @@ interface TypingQuestionProps {
 }
 
 export function TypingQuestion({ word, questionNumber, total, onAnswer }: TypingQuestionProps) {
+  const { t } = useLanguage();
   const [input, setInput] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [correct, setCorrect] = useState(false);
@@ -35,11 +37,11 @@ export function TypingQuestion({ word, questionNumber, total, onAnswer }: Typing
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-8 space-y-6">
       <div className="flex justify-between text-sm text-gray-400">
-        <span>Question {questionNumber} of {total}</span>
+        <span>{t('typing.q.questionOf', { n: questionNumber, total })}</span>
       </div>
 
       <div className="text-center space-y-2">
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">What is the English word for...</p>
+        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{t('typing.q.whatIs')}</p>
         <p className="text-4xl font-bold text-gray-900">{word.translation}</p>
       </div>
 
@@ -47,7 +49,7 @@ export function TypingQuestion({ word, questionNumber, total, onAnswer }: Typing
         <input
           ref={inputRef}
           type="text"
-          placeholder="Type the English term..."
+          placeholder={t('typing.q.placeholder')}
           className={`w-full border-2 rounded-xl px-4 py-3 text-lg outline-none transition-colors ${
             submitted
               ? correct
@@ -63,20 +65,20 @@ export function TypingQuestion({ word, questionNumber, total, onAnswer }: Typing
 
         {submitted && !correct && (
           <p className="text-sm text-gray-600">
-            Correct answer: <span className="font-semibold text-gray-900">{word.term}</span>
+            {t('typing.q.correctAnswer')} <span className="font-semibold text-gray-900">{word.term}</span>
           </p>
         )}
         {submitted && correct && (
-          <p className="text-sm text-green-600 font-medium">Correct!</p>
+          <p className="text-sm text-green-600 font-medium">{t('typing.q.correct')}</p>
         )}
       </div>
 
       <div className="flex justify-end">
         {!submitted ? (
-          <Button onClick={handleSubmit} disabled={!input.trim()}>Check</Button>
+          <Button onClick={handleSubmit} disabled={!input.trim()}>{t('typing.q.check')}</Button>
         ) : (
           <Button onClick={handleNext}>
-            {questionNumber < total ? 'Next' : 'See results'}
+            {questionNumber < total ? t('typing.q.next') : t('typing.q.seeResults')}
           </Button>
         )}
       </div>

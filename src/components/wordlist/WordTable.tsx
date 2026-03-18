@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Word, ListStats } from '../../types';
 import { Button } from '../common/Button';
 import { StatDot } from '../common/StatDot';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface WordTableProps {
   words: Word[];
@@ -12,6 +13,7 @@ interface WordTableProps {
 }
 
 export function WordTable({ words, editable = false, stats, onUpdate, onDelete }: WordTableProps) {
+  const { t } = useLanguage();
   const showStats = stats !== undefined;
   const [sortField, setSortField] = useState<'term' | 'translation'>('term');
   const [sortAsc, setSortAsc] = useState(true);
@@ -27,7 +29,7 @@ export function WordTable({ words, editable = false, stats, onUpdate, onDelete }
   });
 
   if (words.length === 0) {
-    return <p className="text-sm text-gray-400 text-center py-8">No words yet.</p>;
+    return <p className="text-sm text-gray-400 text-center py-8">{t('table.noWords')}</p>;
   }
 
   return (
@@ -35,18 +37,18 @@ export function WordTable({ words, editable = false, stats, onUpdate, onDelete }
       <table className="w-full text-sm">
         <thead className="bg-gray-50">
           <tr>
-            {showStats && <th className="px-3 py-3 text-left font-medium text-gray-600 select-none whitespace-nowrap">Score</th>}
+            {showStats && <th className="px-3 py-3 text-left font-medium text-gray-600 select-none whitespace-nowrap">{t('table.score')}</th>}
             <th
               className="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900 select-none"
               onClick={() => toggleSort('term')}
             >
-              English {sortField === 'term' ? (sortAsc ? '↑' : '↓') : ''}
+              {t('table.english')} {sortField === 'term' ? (sortAsc ? '↑' : '↓') : ''}
             </th>
             <th
               className="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900 select-none"
               onClick={() => toggleSort('translation')}
             >
-              Translation {sortField === 'translation' ? (sortAsc ? '↑' : '↓') : ''}
+              {t('table.translation')} {sortField === 'translation' ? (sortAsc ? '↑' : '↓') : ''}
             </th>
             {editable && <th className="px-4 py-3 w-12" />}
           </tr>

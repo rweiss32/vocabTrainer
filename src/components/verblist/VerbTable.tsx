@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Verb, ListStats } from '../../types';
 import { Button } from '../common/Button';
 import { StatDot } from '../common/StatDot';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface VerbTableProps {
   verbs: Verb[];
@@ -12,9 +13,10 @@ interface VerbTableProps {
 }
 
 export function VerbTable({ verbs, editable = false, stats, onUpdate, onDelete }: VerbTableProps) {
+  const { t } = useLanguage();
   const showStats = stats !== undefined;
   if (verbs.length === 0) {
-    return <p className="text-sm text-gray-400 text-center py-8">No verbs yet.</p>;
+    return <p className="text-sm text-gray-400 text-center py-8">{t('table.noVerbs')}</p>;
   }
 
   return (
@@ -22,11 +24,11 @@ export function VerbTable({ verbs, editable = false, stats, onUpdate, onDelete }
       <table className="w-full text-sm">
         <thead className="bg-gray-50">
           <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            {showStats && <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Score</th>}
-            <th className="px-4 py-3">V1 — Base</th>
-            <th className="px-4 py-3">V2 — Past simple</th>
-            <th className="px-4 py-3">V3 — Past participle</th>
-            <th className="px-4 py-3">Meaning</th>
+            {showStats && <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">{t('table.score')}</th>}
+            <th className="px-4 py-3">{t('table.v1')}</th>
+            <th className="px-4 py-3">{t('table.v2')}</th>
+            <th className="px-4 py-3">{t('table.v3')}</th>
+            <th className="px-4 py-3">{t('table.meaning')}</th>
             {editable && <th className="px-4 py-3 w-12" />}
           </tr>
         </thead>
