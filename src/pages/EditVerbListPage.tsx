@@ -4,6 +4,7 @@ import { useVerbLists } from '../hooks/useVerbLists';
 import { VerbTable } from '../components/verblist/VerbTable';
 import { AddVerbForm } from '../components/verblist/AddVerbForm';
 import { VerbImageUpload } from '../components/verblist/VerbImageUpload';
+import { VerbFileUpload } from '../components/verblist/VerbFileUpload';
 import { Button } from '../components/common/Button';
 import { EditableTitle } from '../components/common/EditableTitle';
 import type { Verb } from '../types';
@@ -42,6 +43,15 @@ export function EditVerbListPage() {
       <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
         <h2 className="text-base font-semibold text-gray-800">Add verb</h2>
         <AddVerbForm onAdd={addVerb} />
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+        <h2 className="text-base font-semibold text-gray-800">Import from file</h2>
+        <p className="text-sm text-gray-500">
+          Upload a TSV or CSV file with columns: <code className="bg-gray-100 px-1 rounded">v1, v2, v3, translation</code>.
+          Duplicates (same V1) are skipped automatically.
+        </p>
+        <VerbFileUpload onImport={handleImageImport} />
       </section>
 
       <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
