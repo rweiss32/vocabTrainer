@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { WordList } from '../../types';
 import { Button } from '../common/Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface WordListCardProps {
   list: WordList;
@@ -11,6 +12,7 @@ interface WordListCardProps {
 }
 
 export function WordListCard({ list, existingNames, onDelete, onRename }: WordListCardProps) {
+  const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(list.name);
 
@@ -46,7 +48,7 @@ export function WordListCard({ list, existingNames, onDelete, onRename }: WordLi
             }}
           />
           {isDuplicate && (
-            <p className="text-xs text-red-500 mt-1">A list with this name already exists.</p>
+            <p className="text-xs text-red-500 mt-1">{t('common.duplicateName')}</p>
           )}
         </div>
       ) : (
@@ -59,14 +61,14 @@ export function WordListCard({ list, existingNames, onDelete, onRename }: WordLi
         </h3>
       )}
 
-      <p className="text-sm text-gray-500">{list.words.length} word{list.words.length !== 1 ? 's' : ''}</p>
+      <p className="text-sm text-gray-500">{list.words.length === 1 ? t('count.words', { n: list.words.length }) : t('count.words_plural', { n: list.words.length })}</p>
 
       <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100">
         <Link to={`/list/${list.id}`} className="flex-1">
-          <Button variant="primary" size="sm" className="w-full justify-center">Study</Button>
+          <Button variant="primary" size="sm" className="w-full justify-center">{t('common.study')}</Button>
         </Link>
         <Link to={`/list/${list.id}/edit`}>
-          <Button variant="secondary" size="sm">Edit</Button>
+          <Button variant="secondary" size="sm">{t('common.edit')}</Button>
         </Link>
         <Button
           variant="ghost"

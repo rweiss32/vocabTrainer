@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { VerbList } from '../../types';
 import { Button } from '../common/Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface VerbListCardProps {
   list: VerbList;
@@ -11,6 +12,7 @@ interface VerbListCardProps {
 }
 
 export function VerbListCard({ list, existingNames, onDelete, onRename }: VerbListCardProps) {
+  const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(list.name);
 
@@ -46,7 +48,7 @@ export function VerbListCard({ list, existingNames, onDelete, onRename }: VerbLi
             }}
           />
           {isDuplicate && (
-            <p className="text-xs text-red-500 mt-1">A list with this name already exists.</p>
+            <p className="text-xs text-red-500 mt-1">{t('common.duplicateName')}</p>
           )}
         </div>
       ) : (
@@ -59,14 +61,14 @@ export function VerbListCard({ list, existingNames, onDelete, onRename }: VerbLi
         </h3>
       )}
 
-      <p className="text-sm text-gray-500">{list.verbs.length} verb{list.verbs.length !== 1 ? 's' : ''}</p>
+      <p className="text-sm text-gray-500">{list.verbs.length === 1 ? t('count.verbs', { n: list.verbs.length }) : t('count.verbs_plural', { n: list.verbs.length })}</p>
 
       <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100">
         <Link to={`/verbs/${list.id}`} className="flex-1">
-          <Button variant="primary" size="sm" className="w-full justify-center">Study</Button>
+          <Button variant="primary" size="sm" className="w-full justify-center">{t('common.study')}</Button>
         </Link>
         <Link to={`/verbs/${list.id}/edit`}>
-          <Button variant="secondary" size="sm">Edit</Button>
+          <Button variant="secondary" size="sm">{t('common.edit')}</Button>
         </Link>
         <Button
           variant="ghost"
