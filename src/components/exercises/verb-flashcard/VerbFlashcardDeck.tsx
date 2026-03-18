@@ -102,6 +102,7 @@ export function VerbFlashcardDeck({ verbs, listId }: VerbFlashcardDeckProps) {
       </div>
 
       <VerbFlashcardCard
+        key={index}
         verb={current}
         flipped={flipped}
         onClick={() => setFlipped((f) => !f)}

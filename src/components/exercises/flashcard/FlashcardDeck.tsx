@@ -104,6 +104,7 @@ export function FlashcardDeck({ words, listId }: FlashcardDeckProps) {
 
       {/* Card */}
       <FlashcardCard
+        key={index}
         word={current}
         flipped={flipped}
         showTranslationFirst={showTranslationFirst}
