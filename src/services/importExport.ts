@@ -1,22 +1,28 @@
-import type { WordList } from '../types';
+import type { WordList, VerbList } from '../types';
 
-const FILE_VERSION = 1;
+const FILE_VERSION = 2;
 
+// Legacy (v1) had only `lists`. v2 adds `verbLists`.
 interface ExportFile {
   version: number;
   exportedAt: number;
-  lists: Array<{ name: string; words: Array<{ term: string; translation: string }> }>;
+  lists?: Array<{ name: string; words: Array<{ term: string; translation: string }> }>;
+  verbLists?: Array<{ name: string; verbs: Array<{ v1: string; v2: string; v3: string; meaning?: string }> }>;
 }
 
-// --- Export ---
+// --- Unified Export (all data) ---
 
-export function exportLists(lists: WordList[]): void {
+export function exportAll(wordLists: WordList[], verbLists: VerbList[]): void {
   const payload: ExportFile = {
     version: FILE_VERSION,
     exportedAt: Date.now(),
-    lists: lists.map((l) => ({
+    lists: wordLists.map((l) => ({
       name: l.name,
       words: l.words.map((w) => ({ term: w.term, translation: w.translation })),
+    })),
+    verbLists: verbLists.map((l) => ({
+      name: l.name,
+      verbs: l.verbs.map((v) => ({ v1: v.v1, v2: v.v2, v3: v.v3, ...(v.meaning ? { meaning: v.meaning } : {}) })),
     })),
   };
 
@@ -29,14 +35,26 @@ export function exportLists(lists: WordList[]): void {
   URL.revokeObjectURL(url);
 }
 
-// --- Import ---
+// --- Single-list export (used on the list detail page) ---
 
-export interface ImportResult {
-  imported: WordList[];
-  skipped: string[]; // names of lists that were skipped (duplicate)
+export function exportLists(lists: WordList[]): void {
+  exportAll(lists, []);
 }
 
-export function parseImportFile(content: string, existingNames: string[]): ImportResult {
+// --- Unified Import ---
+
+export interface ImportAllResult {
+  wordLists: WordList[];
+  verbLists: VerbList[];
+  skippedWords: string[];
+  skippedVerbs: string[];
+}
+
+export function parseImportAll(
+  content: string,
+  existingWordNames: string[],
+  existingVerbNames: string[],
+): ImportAllResult {
   let parsed: ExportFile;
   try {
     parsed = JSON.parse(content);
@@ -44,23 +62,21 @@ export function parseImportFile(content: string, existingNames: string[]): Impor
     throw new Error('Invalid file — could not parse JSON.');
   }
 
-  if (!parsed.lists || !Array.isArray(parsed.lists)) {
-    throw new Error('Invalid file — missing lists array.');
+  if (!parsed.lists && !parsed.verbLists) {
+    throw new Error('Invalid file — no word lists or verb lists found.');
   }
 
-  const existingSet = new Set(existingNames.map((n) => n.toLowerCase()));
-  const imported: WordList[] = [];
-  const skipped: string[] = [];
+  const wordNameSet = new Set(existingWordNames.map((n) => n.toLowerCase()));
+  const verbNameSet = new Set(existingVerbNames.map((n) => n.toLowerCase()));
+  const wordLists: WordList[] = [];
+  const verbLists: VerbList[] = [];
+  const skippedWords: string[] = [];
+  const skippedVerbs: string[] = [];
 
-  for (const raw of parsed.lists) {
+  for (const raw of parsed.lists ?? []) {
     if (!raw.name || !Array.isArray(raw.words)) continue;
-
-    if (existingSet.has(raw.name.toLowerCase())) {
-      skipped.push(raw.name);
-      continue;
-    }
-
-    imported.push({
+    if (wordNameSet.has(raw.name.toLowerCase())) { skippedWords.push(raw.name); continue; }
+    wordLists.push({
       id: crypto.randomUUID(),
       name: raw.name,
       words: raw.words
@@ -69,12 +85,25 @@ export function parseImportFile(content: string, existingNames: string[]): Impor
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-
-    // Track newly imported names to avoid duplicates within the same file
-    existingSet.add(raw.name.toLowerCase());
+    wordNameSet.add(raw.name.toLowerCase());
   }
 
-  return { imported, skipped };
+  for (const raw of parsed.verbLists ?? []) {
+    if (!raw.name || !Array.isArray(raw.verbs)) continue;
+    if (verbNameSet.has(raw.name.toLowerCase())) { skippedVerbs.push(raw.name); continue; }
+    verbLists.push({
+      id: crypto.randomUUID(),
+      name: raw.name,
+      verbs: raw.verbs
+        .filter((v) => v.v1 && v.v2 && v.v3)
+        .map((v) => ({ id: crypto.randomUUID(), v1: v.v1, v2: v.v2, v3: v.v3, meaning: v.meaning })),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    verbNameSet.add(raw.name.toLowerCase());
+  }
+
+  return { wordLists, verbLists, skippedWords, skippedVerbs };
 }
 
 function timestamp(): string {

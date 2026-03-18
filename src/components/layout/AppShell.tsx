@@ -1,4 +1,9 @@
+import { useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { parseImportAll } from '../../services/importExport';
+import * as storage from '../../services/storage';
+import { ExportAllModal } from '../common/ExportAllModal';
+import type { WordList, VerbList } from '../../types';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -8,6 +13,43 @@ export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
   const inVerbs = location.pathname.startsWith('/verbs');
   const isSection = location.pathname === '/' || location.pathname === '/verbs';
+  const importInputRef = useRef<HTMLInputElement>(null);
+  const [exportData, setExportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[] } | null>(null);
+
+  function handleExportClick() {
+    setExportData({ wordLists: storage.getWordLists(), verbLists: storage.getVerbLists() });
+  }
+
+  function handleImportFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      try {
+        const result = parseImportAll(
+          content,
+          storage.getWordLists().map((l) => l.name),
+          storage.getVerbLists().map((l) => l.name),
+        );
+        const total = result.wordLists.length + result.verbLists.length;
+        const skipped = result.skippedWords.length + result.skippedVerbs.length;
+        if (total === 0 && skipped === 0) {
+          alert('No valid lists found in the file.');
+          return;
+        }
+        storage.saveWordLists([...storage.getWordLists(), ...result.wordLists]);
+        storage.saveVerbLists([...storage.getVerbLists(), ...result.verbLists]);
+        const lines: string[] = [];
+        if (total > 0) lines.push(`Imported ${total} list${total !== 1 ? 's' : ''}.`);
+        if (skipped > 0) lines.push(`Skipped ${skipped} (already exist).`);
+        alert(lines.join('\n'));
+        window.location.reload();
+      } catch (err) {
+        alert(err instanceof Error ? err.message : 'Failed to import file.');
+      }
+      if (importInputRef.current) importInputRef.current.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
 
   const backHref = inVerbs ? '/verbs' : '/';
   const backLabel = inVerbs ? 'All verb lists' : 'All lists';
@@ -37,19 +79,54 @@ export function AppShell({ children }: AppShellProps) {
             <Link to="/verbs" className={navTabClass(inVerbs)}>Verb Forms</Link>
           </div>
 
-          {!isSection && (
-            <Link to={backHref} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 ml-auto">
+          <div className="ml-auto flex items-center gap-1">
+            <input
+              ref={importInputRef}
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={(e) => { if (e.target.files?.[0]) handleImportFile(e.target.files[0]); }}
+            />
+            <button
+              onClick={() => importInputRef.current?.click()}
+              title="Import"
+              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
-              {backLabel}
-            </Link>
-          )}
+            </button>
+            <button
+              onClick={handleExportClick}
+              title="Export"
+              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </button>
+            {!isSection && (
+              <Link to={backHref} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 ml-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                {backLabel}
+              </Link>
+            )}
+          </div>
         </div>
       </nav>
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
         {children}
       </main>
+
+      {exportData && (
+        <ExportAllModal
+          wordLists={exportData.wordLists}
+          verbLists={exportData.verbLists}
+          onClose={() => setExportData(null)}
+        />
+      )}
     </div>
   );
 }
