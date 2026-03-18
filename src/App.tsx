@@ -6,6 +6,11 @@ import { EditListPage } from './pages/EditListPage';
 import { FlashcardPage } from './pages/FlashcardPage';
 import { MatchingPage } from './pages/MatchingPage';
 import { TypingPage } from './pages/TypingPage';
+import { VerbsHomePage } from './pages/VerbsHomePage';
+import { VerbListDetailPage } from './pages/VerbListDetailPage';
+import { EditVerbListPage } from './pages/EditVerbListPage';
+import { VerbFlashcardPage } from './pages/VerbFlashcardPage';
+import { VerbTypingPage } from './pages/VerbTypingPage';
 
 const router = createBrowserRouter(
   [
@@ -32,6 +37,26 @@ const router = createBrowserRouter(
     {
       path: '/list/:id/exercise/typing',
       element: <AppShell><TypingPage /></AppShell>,
+    },
+    {
+      path: '/verbs',
+      element: <AppShell><VerbsHomePage /></AppShell>,
+    },
+    {
+      path: '/verbs/:id',
+      element: <AppShell><VerbListDetailPage /></AppShell>,
+    },
+    {
+      path: '/verbs/:id/edit',
+      element: <AppShell><EditVerbListPage /></AppShell>,
+    },
+    {
+      path: '/verbs/:id/exercise/flashcard',
+      element: <AppShell><VerbFlashcardPage /></AppShell>,
+    },
+    {
+      path: '/verbs/:id/exercise/typing',
+      element: <AppShell><VerbTypingPage /></AppShell>,
     },
   ],
   { basename: '/vocabTrainer' }

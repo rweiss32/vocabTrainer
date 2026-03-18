@@ -1,5 +1,6 @@
 export const STORAGE_KEYS = {
   WORD_LISTS: 'vt_word_lists',
+  VERB_LISTS: 'vt_verb_lists',
   SETTINGS: 'vt_settings',
 } as const;
 

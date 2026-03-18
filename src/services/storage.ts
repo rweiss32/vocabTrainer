@@ -1,4 +1,4 @@
-import type { WordList, AppSettings } from '../types';
+import type { WordList, VerbList, AppSettings } from '../types';
 import { STORAGE_KEYS, DEFAULT_SETTINGS } from '../constants';
 
 // --- Word Lists ---
@@ -44,6 +44,51 @@ export function updateWordList(id: string, data: Partial<Omit<WordList, 'id' | '
 
 export function deleteWordList(id: string): void {
   saveWordLists(getWordLists().filter((l) => l.id !== id));
+}
+
+// --- Verb Lists ---
+
+export function getVerbLists(): VerbList[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.VERB_LISTS);
+    return raw ? (JSON.parse(raw) as VerbList[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveVerbLists(lists: VerbList[]): void {
+  localStorage.setItem(STORAGE_KEYS.VERB_LISTS, JSON.stringify(lists));
+}
+
+export function getVerbList(id: string): VerbList | undefined {
+  return getVerbLists().find((l) => l.id === id);
+}
+
+export function createVerbList(name: string): VerbList {
+  const list: VerbList = {
+    id: crypto.randomUUID(),
+    name,
+    verbs: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  saveVerbLists([...getVerbLists(), list]);
+  return list;
+}
+
+export function updateVerbList(id: string, data: Partial<Omit<VerbList, 'id' | 'createdAt'>>): VerbList | undefined {
+  const lists = getVerbLists();
+  const index = lists.findIndex((l) => l.id === id);
+  if (index === -1) return undefined;
+  const updated = { ...lists[index], ...data, updatedAt: Date.now() };
+  lists[index] = updated;
+  saveVerbLists(lists);
+  return updated;
+}
+
+export function deleteVerbList(id: string): void {
+  saveVerbLists(getVerbLists().filter((l) => l.id !== id));
 }
 
 // --- Settings ---

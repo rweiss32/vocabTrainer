@@ -16,3 +16,19 @@ export interface AppSettings {
   nativeLanguage: string;
   matchingPairCount: number;
 }
+
+export interface Verb {
+  id: string;
+  v1: string;   // base form (e.g. go)
+  v2: string;   // past simple (e.g. went)
+  v3: string;   // past participle (e.g. gone)
+  meaning?: string; // optional native-language gloss
+}
+
+export interface VerbList {
+  id: string;
+  name: string;
+  verbs: Verb[];
+  createdAt: number;
+  updatedAt: number;
+}
