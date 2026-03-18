@@ -15,6 +15,7 @@ const en = {
   'common.done': 'Done',
   'common.study': 'Study',
   'common.edit': 'Edit',
+  'common.back': 'Back',
   'common.newList': 'New list',
   'common.createList': 'Create a list',
   'common.duplicateName': 'A list with this name already exists.',
@@ -127,6 +128,24 @@ const en = {
   'matching.english': 'English',
   'matching.translation': 'Translation',
 
+  // Matching page
+  'matching.pageTitle': 'Matching — {name}',
+  'matching.needMoreWords': 'Need at least 2 words for matching.',
+  'matching.instruction': 'Click a word on the left, then its translation on the right.',
+  'matching.perfect': 'Perfect match!',
+  'matching.roundComplete': 'Round complete!',
+  'matching.noMistakesMsg': 'No mistakes — excellent work!',
+  'matching.mistakeCount': '{n} mistake',
+  'matching.mistakeCount_plural': '{n} mistakes',
+  'matching.playAgain': 'Play again',
+  'matching.backToList': 'Back to list',
+
+  // Exercise page titles and empty states
+  'page.flashcards.title': 'Flashcards — {name}',
+  'page.typing.title': 'Typing — {name}',
+  'page.noWords': 'No words in this list.',
+  'page.noVerbs': 'No verbs in this list.',
+
   // Tables
   'table.score': 'Score',
   'table.english': 'English',
@@ -180,6 +199,42 @@ const en = {
   'modal.import.renamed': '{n} list renamed to avoid conflicts',
   'modal.import.renamed_plural': '{n} lists renamed to avoid conflicts',
 
+  // Upload / drop zones
+  'upload.dropFileOr': 'Drop a file here or',
+  'upload.dropImageOr': 'Drop an image here or',
+  'upload.browse': 'browse',
+  'upload.wordFileHint': 'TSV or CSV — one word pair per line',
+  'upload.verbFileHint': 'TSV or CSV — columns: v1, v2, v3, translation',
+  'upload.imageHint': 'JPG, PNG — printed English words only',
+  'upload.verbImageHint': 'Works best with lines like: go / went / gone',
+  'upload.scanning': 'Scanning image...',
+  'upload.fetchingTranslations': 'Fetching translations... ({done}/{total})',
+  'upload.wordsReady': '{n} word ready to import',
+  'upload.wordsReady_plural': '{n} words ready to import',
+  'upload.verbsReady': '{n} verb ready to import',
+  'upload.verbsReady_plural': '{n} verbs ready to import',
+  'upload.verbsMissing': '{n} verb missing V2/V3 — fill in or uncheck',
+  'upload.verbsMissing_plural': '{n} verbs missing V2/V3 — fill in or uncheck',
+  'upload.previewWords': 'Preview — {n} words found',
+  'upload.previewVerbs': 'Preview — {n} verbs found',
+  'upload.fetchingCell': 'fetching...',
+  'upload.translationPlaceholder': 'type translation...',
+  'upload.meaningPlaceholder': 'meaning...',
+  'upload.scanError': 'Could not scan the image. Try a clearer photo with printed text.',
+  'upload.noWordsFound': 'No English words found in the image.',
+  'upload.noVerbsFound': 'No verbs found in the image.',
+  'upload.suggestedTitle': 'Suggested from built-in table',
+  'upload.suggestedHint': 'Italic values are suggestions from the built-in table — verify before importing.',
+
+  // Add word / verb forms
+  'form.englishTerm': 'English term',
+  'form.translation': 'Translation',
+  'form.fetchingSuggestion': 'fetching...',
+  'form.useSuggestion': '↑ use this',
+  'form.suggestionError': 'Could not fetch suggestion.',
+  'form.add': 'Add',
+  'form.meaningOptional': 'Meaning (optional)',
+
   // Word / verb counts
   'count.words': '{n} word',
   'count.words_plural': '{n} words',
@@ -202,6 +257,7 @@ const he: { [K in keyof typeof en]: string } = {
   'common.done': 'סיום',
   'common.study': 'תרגל',
   'common.edit': 'ערוך',
+  'common.back': 'חזרה',
   'common.newList': 'רשימה חדשה',
   'common.createList': 'צור רשימה',
   'common.duplicateName': 'רשימה בשם זה כבר קיימת.',
@@ -314,6 +370,24 @@ const he: { [K in keyof typeof en]: string } = {
   'matching.english': 'אנגלית',
   'matching.translation': 'תרגום',
 
+  // Matching page
+  'matching.pageTitle': 'התאמה — {name}',
+  'matching.needMoreWords': 'צריך לפחות 2 מילים להתאמה.',
+  'matching.instruction': 'לחץ על מילה משמאל, ואחר כך על תרגומה מימין.',
+  'matching.perfect': 'התאמה מושלמת!',
+  'matching.roundComplete': 'סיבוב הושלם!',
+  'matching.noMistakesMsg': 'אין טעויות — עבודה מצוינת!',
+  'matching.mistakeCount': 'טעות {n}',
+  'matching.mistakeCount_plural': '{n} טעויות',
+  'matching.playAgain': 'שחק שוב',
+  'matching.backToList': 'חזרה לרשימה',
+
+  // Exercise page titles and empty states
+  'page.flashcards.title': 'כרטיסיות — {name}',
+  'page.typing.title': 'הקלדה — {name}',
+  'page.noWords': 'אין מילים ברשימה זו.',
+  'page.noVerbs': 'אין פעלים ברשימה זו.',
+
   // Tables
   'table.score': 'ניקוד',
   'table.english': 'אנגלית',
@@ -366,6 +440,42 @@ const he: { [K in keyof typeof en]: string } = {
   'modal.import.verbLists': 'רשימות פעלים',
   'modal.import.renamed': '{n} רשימה שונתה למניעת כפילויות',
   'modal.import.renamed_plural': '{n} רשימות שונו למניעת כפילויות',
+
+  // Upload / drop zones
+  'upload.dropFileOr': 'הפל קובץ כאן או',
+  'upload.dropImageOr': 'הפל תמונה כאן או',
+  'upload.browse': 'עיין',
+  'upload.wordFileHint': 'TSV או CSV — זוג מילים בכל שורה',
+  'upload.verbFileHint': 'TSV או CSV — עמודות: v1, v2, v3, תרגום',
+  'upload.imageHint': 'JPG, PNG — מילים מודפסות באנגלית בלבד',
+  'upload.verbImageHint': 'עובד הכי טוב עם שורות כמו: go / went / gone',
+  'upload.scanning': 'סורק תמונה...',
+  'upload.fetchingTranslations': 'מאחזר תרגומים... ({done}/{total})',
+  'upload.wordsReady': 'מילה {n} מוכנה לייבוא',
+  'upload.wordsReady_plural': '{n} מילים מוכנות לייבוא',
+  'upload.verbsReady': 'פועל {n} מוכן לייבוא',
+  'upload.verbsReady_plural': '{n} פעלים מוכנים לייבוא',
+  'upload.verbsMissing': 'פועל {n} חסר V2/V3 — מלא או בטל',
+  'upload.verbsMissing_plural': '{n} פעלים חסרים V2/V3 — מלא או בטל',
+  'upload.previewWords': 'תצוגה מקדימה — {n} מילים נמצאו',
+  'upload.previewVerbs': 'תצוגה מקדימה — {n} פעלים נמצאו',
+  'upload.fetchingCell': 'מאחזר...',
+  'upload.translationPlaceholder': 'הקלד תרגום...',
+  'upload.meaningPlaceholder': 'משמעות...',
+  'upload.scanError': 'לא ניתן לסרוק את התמונה. נסה תמונה ברורה יותר עם טקסט מודפס.',
+  'upload.noWordsFound': 'לא נמצאו מילים באנגלית בתמונה.',
+  'upload.noVerbsFound': 'לא נמצאו פעלים בתמונה.',
+  'upload.suggestedTitle': 'הצעה מהטבלה המובנית',
+  'upload.suggestedHint': 'ערכים נטויים הם הצעות מהטבלה המובנית — אמת לפני הייבוא.',
+
+  // Add word / verb forms
+  'form.englishTerm': 'מונח באנגלית',
+  'form.translation': 'תרגום',
+  'form.fetchingSuggestion': 'מאחזר...',
+  'form.useSuggestion': '↑ השתמש בזה',
+  'form.suggestionError': 'לא ניתן לאחזר הצעה.',
+  'form.add': 'הוסף',
+  'form.meaningOptional': 'משמעות (אופציונלי)',
 
   // Word / verb counts
   'count.words': 'מילה {n}',

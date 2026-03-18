@@ -2,12 +2,14 @@ import { useRef, useState } from 'react';
 import type { Verb } from '../../types';
 import { parseVerbFile, type VerbParseResult } from '../../services/fileParser';
 import { Button } from '../common/Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface VerbFileUploadProps {
   onImport: (verbs: Verb[]) => void;
 }
 
 export function VerbFileUpload({ onImport }: VerbFileUploadProps) {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<VerbParseResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -45,8 +47,8 @@ export function VerbFileUpload({ onImport }: VerbFileUploadProps) {
         <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
         </svg>
-        <p className="text-sm text-gray-600">Drop a file here or <span className="text-indigo-600 font-medium">browse</span></p>
-        <p className="text-xs text-gray-400 mt-1">TSV or CSV — columns: <code className="bg-gray-100 px-1 rounded">v1, v2, v3, translation</code></p>
+        <p className="text-sm text-gray-600">{t('upload.dropFileOr')} <span className="text-indigo-600 font-medium">{t('upload.browse')}</span></p>
+        <p className="text-xs text-gray-400 mt-1">{t('upload.verbFileHint')}</p>
         <input
           ref={inputRef}
           type="file"
@@ -60,11 +62,11 @@ export function VerbFileUpload({ onImport }: VerbFileUploadProps) {
         <div className="border border-gray-200 rounded-xl overflow-hidden">
           <div className="bg-gray-50 px-4 py-2 flex items-center justify-between border-b border-gray-200">
             <span className="text-sm font-medium text-gray-700">
-              Preview — {preview.verbs.length} verb{preview.verbs.length !== 1 ? 's' : ''} found
+              {t('upload.previewVerbs', { n: preview.verbs.length })}
             </span>
             <div className="flex gap-2">
-              <Button variant="secondary" size="sm" onClick={() => setPreview(null)}>Cancel</Button>
-              <Button size="sm" onClick={handleConfirm} disabled={preview.verbs.length === 0}>Import</Button>
+              <Button variant="secondary" size="sm" onClick={() => setPreview(null)}>{t('common.cancel')}</Button>
+              <Button size="sm" onClick={handleConfirm} disabled={preview.verbs.length === 0}>{t('common.import')}</Button>
             </div>
           </div>
 
@@ -83,7 +85,7 @@ export function VerbFileUpload({ onImport }: VerbFileUploadProps) {
                   <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">V1</th>
                   <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">V2</th>
                   <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">V3</th>
-                  <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">Translation</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">{t('table.translation')}</th>
                 </tr>
               </thead>
               <tbody>

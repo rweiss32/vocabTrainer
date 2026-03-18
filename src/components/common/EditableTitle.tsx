@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface EditableTitleProps {
   value: string;
@@ -7,6 +8,7 @@ interface EditableTitleProps {
 }
 
 export function EditableTitle({ value, onSave, existingNames = [] }: EditableTitleProps) {
+  const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -49,7 +51,7 @@ export function EditableTitle({ value, onSave, existingNames = [] }: EditableTit
           }}
         />
         {isDuplicate && (
-          <p className="text-xs text-red-500 mt-1">A list with this name already exists.</p>
+          <p className="text-xs text-red-500 mt-1">{t('common.duplicateName')}</p>
         )}
       </div>
     );

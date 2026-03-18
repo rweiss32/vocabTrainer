@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '../common/Button';
 import { translateToHebrew } from '../../services/translationService';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface AddWordFormProps {
   onAdd: (term: string, translation: string) => void;
 }
 
 export function AddWordForm({ onAdd }: AddWordFormProps) {
+  const { t } = useLanguage();
   const [term, setTerm] = useState('');
   const [translation, setTranslation] = useState('');
   const [suggestion, setSuggestion] = useState<string | null>(null);
@@ -49,10 +51,10 @@ export function AddWordForm({ onAdd }: AddWordFormProps) {
   }
 
   function handleSubmit() {
-    const t = term.trim();
+    const trimmedTerm = term.trim();
     const tr = translation.trim();
-    if (!t || !tr) return;
-    onAdd(t, tr);
+    if (!trimmedTerm || !tr) return;
+    onAdd(trimmedTerm, tr);
     setTerm('');
     setTranslation('');
     setSuggestion(null);
@@ -63,7 +65,7 @@ export function AddWordForm({ onAdd }: AddWordFormProps) {
   return (
     <div className="flex gap-2 items-start">
       <div className="flex-1">
-        <label className="block text-xs font-medium text-gray-500 mb-1">English term</label>
+        <label className="block text-xs font-medium text-gray-500 mb-1">{t('form.englishTerm')}</label>
         <input
           ref={termRef}
           type="text"
@@ -77,9 +79,9 @@ export function AddWordForm({ onAdd }: AddWordFormProps) {
 
       <div className="flex-1">
         <label className="block text-xs font-medium text-gray-500 mb-1">
-          Translation
+          {t('form.translation')}
           {loadingSuggestion && (
-            <span className="ml-2 text-indigo-400 font-normal">fetching...</span>
+            <span className="ml-2 text-indigo-400 font-normal">{t('form.fetchingSuggestion')}</span>
           )}
         </label>
         <input
@@ -100,17 +102,17 @@ export function AddWordForm({ onAdd }: AddWordFormProps) {
             <span className="bg-indigo-50 border border-indigo-200 rounded px-1.5 py-0.5 font-medium group-hover:bg-indigo-100 transition-colors" dir="rtl">
               {suggestion}
             </span>
-            <span className="text-gray-400 group-hover:text-indigo-600">↑ use this</span>
+            <span className="text-gray-400 group-hover:text-indigo-600">{t('form.useSuggestion')}</span>
           </button>
         )}
         {suggestionError && (
-          <p className="mt-1 text-xs text-gray-400">Could not fetch suggestion.</p>
+          <p className="mt-1 text-xs text-gray-400">{t('form.suggestionError')}</p>
         )}
       </div>
 
       <div className="pt-5">
         <Button onClick={handleSubmit} disabled={!term.trim() || !translation.trim()}>
-          Add
+          {t('form.add')}
         </Button>
       </div>
     </div>

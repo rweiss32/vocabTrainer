@@ -4,6 +4,7 @@ import { extractVerbsFromImage, type OcrVerb } from '../../services/ocrService';
 import { translateToHebrew } from '../../services/translationService';
 import { lookupIrregularVerb } from '../../data/irregularVerbs';
 import { Button } from '../common/Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface VerbPreviewRow {
   id: string;
@@ -26,6 +27,7 @@ interface VerbImageUploadProps {
 type Stage = 'idle' | 'scanning' | 'translating' | 'preview';
 
 export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<Stage>('idle');
   const [ocrProgress, setOcrProgress] = useState(0);
@@ -42,13 +44,13 @@ export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
     try {
       ocrVerbs = await extractVerbsFromImage(file, setOcrProgress);
     } catch {
-      setError('Could not scan the image. Try a clearer photo with printed text.');
+      setError(t('upload.scanError'));
       setStage('idle');
       return;
     }
 
     if (ocrVerbs.length === 0) {
-      setError('No verbs found in the image.');
+      setError(t('upload.noVerbsFound'));
       setStage('idle');
       return;
     }
@@ -146,7 +148,7 @@ export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
   if (stage === 'scanning') {
     return (
       <div className="border-2 border-dashed border-indigo-200 rounded-xl p-8 text-center space-y-3">
-        <p className="text-sm font-medium text-gray-700">Scanning image...</p>
+        <p className="text-sm font-medium text-gray-700">{t('upload.scanning')}</p>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div className="bg-indigo-500 h-2 rounded-full transition-all duration-300" style={{ width: `${ocrProgress}%` }} />
         </div>
@@ -161,15 +163,15 @@ export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
         <div className="bg-gray-50 px-4 py-2 flex items-center justify-between border-b border-gray-200">
           <span className="text-sm font-medium text-gray-700">
             {stillTranslating
-              ? `Fetching translations... (${rows.filter((r) => !r.translating).length}/${rows.length})`
+              ? t('upload.fetchingTranslations', { done: rows.filter((r) => !r.translating).length, total: rows.length })
               : incompleteCount > 0
-              ? <span className="text-amber-600">{incompleteCount} verb{incompleteCount !== 1 ? 's' : ''} missing V2/V3 — fill in or uncheck</span>
-              : `${readyCount} verb${readyCount !== 1 ? 's' : ''} ready to import`}
+              ? <span className="text-amber-600">{incompleteCount === 1 ? t('upload.verbsMissing', { n: incompleteCount }) : t('upload.verbsMissing_plural', { n: incompleteCount })}</span>
+              : readyCount === 1 ? t('upload.verbsReady', { n: readyCount }) : t('upload.verbsReady_plural', { n: readyCount })}
           </span>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={reset}>Cancel</Button>
+            <Button variant="secondary" size="sm" onClick={reset}>{t('common.cancel')}</Button>
             <Button size="sm" onClick={handleConfirm} disabled={stillTranslating || readyCount === 0}>
-              Import
+              {t('common.import')}
             </Button>
           </div>
         </div>
@@ -182,7 +184,7 @@ export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
                 <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">V1</th>
                 <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">V2</th>
                 <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">V3</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">Meaning</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">{t('table.meaning')}</th>
               </tr>
             </thead>
             <tbody>
@@ -212,7 +214,7 @@ export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
                       } ${row.v2Suggested ? 'italic text-indigo-600' : ''}`}
                       value={row.v2}
                       placeholder={row.v2Missing ? '?' : ''}
-                      title={row.v2Suggested ? 'Suggested from built-in table' : undefined}
+                      title={row.v2Suggested ? t('upload.suggestedTitle') : undefined}
                       onChange={(e) => updateRow(row.id, 'v2', e.target.value)}
                     />
                   </td>
@@ -225,19 +227,19 @@ export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
                       } ${row.v3Suggested ? 'italic text-indigo-600' : ''}`}
                       value={row.v3}
                       placeholder={row.v3Missing ? '?' : ''}
-                      title={row.v3Suggested ? 'Suggested from built-in table' : undefined}
+                      title={row.v3Suggested ? t('upload.suggestedTitle') : undefined}
                       onChange={(e) => updateRow(row.id, 'v3', e.target.value)}
                     />
                   </td>
                   <td className="px-3 py-2">
                     {row.translating ? (
-                      <span className="text-gray-300 text-xs">fetching...</span>
+                      <span className="text-gray-300 text-xs">{t('upload.fetchingCell')}</span>
                     ) : (
                       <input
                         className="w-full bg-transparent border-b border-transparent hover:border-gray-300 focus:border-indigo-400 outline-none"
                         value={row.meaning}
                         dir="auto"
-                        placeholder="meaning..."
+                        placeholder={t('upload.meaningPlaceholder')}
                         onChange={(e) => updateRow(row.id, 'meaning', e.target.value)}
                       />
                     )}
@@ -250,7 +252,7 @@ export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
 
         {rows.some((r) => r.v2Suggested || r.v3Suggested) && (
           <p className="px-4 py-2 text-xs text-indigo-500 border-t bg-gray-50">
-            <span className="italic font-medium">Italic</span> values are suggestions from the built-in table — verify before importing.
+            {t('upload.suggestedHint')}
           </p>
         )}
       </div>
@@ -270,8 +272,8 @@ export function VerbImageUpload({ onImport }: VerbImageUploadProps) {
         <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <p className="text-sm text-gray-600">Drop an image here or <span className="text-indigo-600 font-medium">browse</span></p>
-        <p className="text-xs text-gray-400 mt-1">Works best with lines like: go / went / gone</p>
+        <p className="text-sm text-gray-600">{t('upload.dropImageOr')} <span className="text-indigo-600 font-medium">{t('upload.browse')}</span></p>
+        <p className="text-xs text-gray-400 mt-1">{t('upload.verbImageHint')}</p>
         <input
           ref={inputRef}
           type="file"

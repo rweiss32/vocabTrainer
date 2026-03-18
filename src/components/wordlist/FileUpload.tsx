@@ -2,12 +2,14 @@ import { useRef, useState } from 'react';
 import type { Word } from '../../types';
 import { parseWordFile, type ParseResult } from '../../services/fileParser';
 import { Button } from '../common/Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface FileUploadProps {
   onImport: (words: Word[]) => void;
 }
 
 export function FileUpload({ onImport }: FileUploadProps) {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<ParseResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -44,8 +46,8 @@ export function FileUpload({ onImport }: FileUploadProps) {
         <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
         </svg>
-        <p className="text-sm text-gray-600">Drop a file here or <span className="text-indigo-600 font-medium">browse</span></p>
-        <p className="text-xs text-gray-400 mt-1">TSV or CSV — one word pair per line</p>
+        <p className="text-sm text-gray-600">{t('upload.dropFileOr')} <span className="text-indigo-600 font-medium">{t('upload.browse')}</span></p>
+        <p className="text-xs text-gray-400 mt-1">{t('upload.wordFileHint')}</p>
         <input
           ref={inputRef}
           type="file"
@@ -58,10 +60,10 @@ export function FileUpload({ onImport }: FileUploadProps) {
       {preview && (
         <div className="border border-gray-200 rounded-xl overflow-hidden">
           <div className="bg-gray-50 px-4 py-2 flex items-center justify-between border-b border-gray-200">
-            <span className="text-sm font-medium text-gray-700">Preview — {preview.words.length} words found</span>
+            <span className="text-sm font-medium text-gray-700">{t('upload.previewWords', { n: preview.words.length })}</span>
             <div className="flex gap-2">
-              <Button variant="secondary" size="sm" onClick={() => setPreview(null)}>Cancel</Button>
-              <Button size="sm" onClick={handleConfirm} disabled={preview.words.length === 0}>Import</Button>
+              <Button variant="secondary" size="sm" onClick={() => setPreview(null)}>{t('common.cancel')}</Button>
+              <Button size="sm" onClick={handleConfirm} disabled={preview.words.length === 0}>{t('common.import')}</Button>
             </div>
           </div>
 
@@ -77,8 +79,8 @@ export function FileUpload({ onImport }: FileUploadProps) {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 sticky top-0">
                 <tr>
-                  <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">English</th>
-                  <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">Translation</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">{t('table.english')}</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600 border-b">{t('table.translation')}</th>
                 </tr>
               </thead>
               <tbody>

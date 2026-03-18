@@ -3,6 +3,7 @@ import type { WordList } from '../../types';
 import { exportLists } from '../../services/importExport';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface ExportModalProps {
   lists: WordList[];
@@ -10,6 +11,7 @@ interface ExportModalProps {
 }
 
 export function ExportModal({ lists, onClose }: ExportModalProps) {
+  const { t } = useLanguage();
   const [selected, setSelected] = useState<Set<string>>(new Set(lists.map((l) => l.id)));
 
   const allSelected = selected.size === lists.length;
@@ -34,19 +36,19 @@ export function ExportModal({ lists, onClose }: ExportModalProps) {
 
   return (
     <Modal
-      title="Export word lists"
+      title={t('common.export')}
       onClose={onClose}
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
           <Button onClick={handleExport} disabled={selected.size === 0}>
-            Export {selected.size > 0 ? `(${selected.size})` : ''}
+            {t('common.export')}{selected.size > 0 ? ` (${selected.size})` : ''}
           </Button>
         </>
       }
     >
       <div className="space-y-3">
-        <p className="text-sm text-gray-500">Select the lists to include in the export file.</p>
+        <p className="text-sm text-gray-500">{t('modal.export.description')}</p>
 
         <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer select-none">
           <input
@@ -55,7 +57,7 @@ export function ExportModal({ lists, onClose }: ExportModalProps) {
             onChange={toggleAll}
             className="rounded border-gray-300 text-indigo-600"
           />
-          Select all
+          {t('modal.export.selectAll')}
         </label>
 
         <div className="border-t pt-2 space-y-2 max-h-64 overflow-y-auto">
@@ -68,7 +70,7 @@ export function ExportModal({ lists, onClose }: ExportModalProps) {
                 className="rounded border-gray-300 text-indigo-600"
               />
               <span className="flex-1 truncate">{list.name}</span>
-              <span className="text-gray-400 shrink-0">{list.words.length} words</span>
+              <span className="text-gray-400 shrink-0">{list.words.length === 1 ? t('count.words', { n: list.words.length }) : t('count.words_plural', { n: list.words.length })}</span>
             </label>
           ))}
         </div>

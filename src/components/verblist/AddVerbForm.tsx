@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react';
 import { Button } from '../common/Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface AddVerbFormProps {
   onAdd: (v1: string, v2: string, v3: string, meaning?: string) => void;
 }
 
 export function AddVerbForm({ onAdd }: AddVerbFormProps) {
+  const { t } = useLanguage();
   const [v1, setV1] = useState('');
   const [v2, setV2] = useState('');
   const [v3, setV3] = useState('');
@@ -29,7 +31,7 @@ export function AddVerbForm({ onAdd }: AddVerbFormProps) {
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">V1 — Base form</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">{t('verbTyping.q.v1Label')}</label>
           <input
             ref={v1Ref}
             autoFocus
@@ -42,7 +44,7 @@ export function AddVerbForm({ onAdd }: AddVerbFormProps) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">V2 — Past simple</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">{t('verbTyping.q.v2Label')}</label>
           <input
             type="text"
             placeholder="e.g. went"
@@ -53,7 +55,7 @@ export function AddVerbForm({ onAdd }: AddVerbFormProps) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">V3 — Past participle</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">{t('verbTyping.q.v3Label')}</label>
           <input
             type="text"
             placeholder="e.g. gone"
@@ -66,7 +68,7 @@ export function AddVerbForm({ onAdd }: AddVerbFormProps) {
       </div>
       <div className="flex items-end gap-3">
         <div className="flex-1">
-          <label className="block text-xs font-medium text-gray-500 mb-1">Meaning (optional)</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">{t('form.meaningOptional')}</label>
           <input
             type="text"
             placeholder="e.g. ללכת"
@@ -77,7 +79,7 @@ export function AddVerbForm({ onAdd }: AddVerbFormProps) {
           />
         </div>
         <Button onClick={handleAdd} disabled={!v1.trim() || !v2.trim() || !v3.trim()}>
-          Add verb
+          {t('editVerb.addVerb')}
         </Button>
       </div>
     </div>

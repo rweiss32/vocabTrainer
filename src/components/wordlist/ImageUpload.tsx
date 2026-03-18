@@ -3,6 +3,7 @@ import type { Word } from '../../types';
 import { extractWordsFromImage } from '../../services/ocrService';
 import { translateToHebrew } from '../../services/translationService';
 import { Button } from '../common/Button';
+import { useLanguage } from '../../lang/LanguageContext';
 
 interface PreviewRow {
   id: string;
@@ -19,6 +20,7 @@ interface ImageUploadProps {
 type Stage = 'idle' | 'scanning' | 'translating' | 'preview';
 
 export function ImageUpload({ onImport }: ImageUploadProps) {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<Stage>('idle');
   const [ocrProgress, setOcrProgress] = useState(0);
@@ -35,13 +37,13 @@ export function ImageUpload({ onImport }: ImageUploadProps) {
     try {
       terms = await extractWordsFromImage(file, setOcrProgress);
     } catch {
-      setError('Could not scan the image. Try a clearer photo with printed text.');
+      setError(t('upload.scanError'));
       setStage('idle');
       return;
     }
 
     if (terms.length === 0) {
-      setError('No English words found in the image.');
+      setError(t('upload.noWordsFound'));
       setStage('idle');
       return;
     }
@@ -112,7 +114,7 @@ export function ImageUpload({ onImport }: ImageUploadProps) {
   if (stage === 'scanning') {
     return (
       <div className="border-2 border-dashed border-indigo-200 rounded-xl p-8 text-center space-y-3">
-        <p className="text-sm font-medium text-gray-700">Scanning image...</p>
+        <p className="text-sm font-medium text-gray-700">{t('upload.scanning')}</p>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-indigo-500 h-2 rounded-full transition-all duration-300"
@@ -130,17 +132,17 @@ export function ImageUpload({ onImport }: ImageUploadProps) {
         <div className="bg-gray-50 px-4 py-2 flex items-center justify-between border-b border-gray-200">
           <span className="text-sm font-medium text-gray-700">
             {stillTranslating
-              ? `Fetching translations... (${rows.filter((r) => !r.translating).length}/${rows.length})`
-              : `${includedCount} word${includedCount !== 1 ? 's' : ''} ready to import`}
+              ? t('upload.fetchingTranslations', { done: rows.filter((r) => !r.translating).length, total: rows.length })
+              : includedCount === 1 ? t('upload.wordsReady', { n: includedCount }) : t('upload.wordsReady_plural', { n: includedCount })}
           </span>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={reset}>Cancel</Button>
+            <Button variant="secondary" size="sm" onClick={reset}>{t('common.cancel')}</Button>
             <Button
               size="sm"
               onClick={handleConfirm}
               disabled={stillTranslating || includedCount === 0}
             >
-              Import
+              {t('common.import')}
             </Button>
           </div>
         </div>
@@ -150,8 +152,8 @@ export function ImageUpload({ onImport }: ImageUploadProps) {
             <thead className="bg-gray-50 sticky top-0">
               <tr>
                 <th className="px-3 py-2 w-8 border-b" />
-                <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">English</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">Translation</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">{t('table.english')}</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 border-b">{t('table.translation')}</th>
               </tr>
             </thead>
             <tbody>
@@ -174,13 +176,13 @@ export function ImageUpload({ onImport }: ImageUploadProps) {
                   </td>
                   <td className="px-3 py-2">
                     {row.translating ? (
-                      <span className="text-gray-300 text-xs">fetching...</span>
+                      <span className="text-gray-300 text-xs">{t('upload.fetchingCell')}</span>
                     ) : (
                       <input
                         className="w-full bg-transparent border-b border-transparent hover:border-gray-300 focus:border-indigo-400 outline-none"
                         value={row.translation}
                         dir="auto"
-                        placeholder="type translation..."
+                        placeholder={t('upload.translationPlaceholder')}
                         onChange={(e) => updateRow(row.id, 'translation', e.target.value)}
                       />
                     )}
@@ -207,8 +209,8 @@ export function ImageUpload({ onImport }: ImageUploadProps) {
         <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <p className="text-sm text-gray-600">Drop an image here or <span className="text-indigo-600 font-medium">browse</span></p>
-        <p className="text-xs text-gray-400 mt-1">JPG, PNG — printed English words only</p>
+        <p className="text-sm text-gray-600">{t('upload.dropImageOr')} <span className="text-indigo-600 font-medium">{t('upload.browse')}</span></p>
+        <p className="text-xs text-gray-400 mt-1">{t('upload.imageHint')}</p>
         <input
           ref={inputRef}
           type="file"
