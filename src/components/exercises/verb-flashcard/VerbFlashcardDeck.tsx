@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Verb } from '../../../types';
 import { VerbFlashcardCard } from './VerbFlashcardCard';
 import { Button } from '../../common/Button';
+import { Link } from 'react-router-dom';
 import { useListStats } from '../../../hooks/useListStats';
 import { getStatColor } from '../../common/StatDot';
 
@@ -33,6 +34,9 @@ export function VerbFlashcardDeck({ verbs, listId }: VerbFlashcardDeckProps) {
   const [deck, setDeck] = useState<Verb[]>(() => shuffle(activeVerbs));
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [sessionCorrect, setSessionCorrect] = useState(0);
+  const [sessionTotal, setSessionTotal] = useState(0);
+  const [done, setDone] = useState(false);
 
   const current = deck[index];
 
@@ -46,18 +50,22 @@ export function VerbFlashcardDeck({ verbs, listId }: VerbFlashcardDeckProps) {
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
+      if (done) return;
       if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setFlipped((f) => !f); }
       if (e.key === 'ArrowLeft') prev();
       if (e.key === 'ArrowRight') next();
     }
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [prev, next]);
+  }, [prev, next, done]);
 
   function rebuildDeck(pool: Verb[]) {
     setDeck(shuffle(pool));
     setIndex(0);
     setFlipped(false);
+    setSessionCorrect(0);
+    setSessionTotal(0);
+    setDone(false);
   }
 
   function handleToggleWeak() {
@@ -73,7 +81,31 @@ export function VerbFlashcardDeck({ verbs, listId }: VerbFlashcardDeckProps) {
 
   function handleRate(correct: boolean) {
     recordAnswer(current.id, correct);
-    if (index < deck.length - 1) goTo(index + 1);
+    const newTotal = sessionTotal + 1;
+    const newCorrect = sessionCorrect + (correct ? 1 : 0);
+    setSessionTotal(newTotal);
+    setSessionCorrect(newCorrect);
+    if (index >= deck.length - 1) {
+      setDone(true);
+    } else {
+      goTo(index + 1);
+    }
+  }
+
+  if (done) {
+    const percent = Math.round((sessionCorrect / sessionTotal) * 100);
+    return (
+      <div className="bg-white rounded-2xl border border-gray-200 p-10 text-center space-y-4 max-w-md mx-auto">
+        <div className="text-5xl">{percent === 100 ? '🎉' : percent >= 70 ? '👍' : '📚'}</div>
+        <h2 className="text-xl font-bold text-gray-900">Session complete!</h2>
+        <p className="text-3xl font-bold text-indigo-600">{sessionCorrect} / {sessionTotal}</p>
+        <p className="text-gray-500">{percent}% known</p>
+        <div className="flex justify-center gap-3 pt-2">
+          <Button onClick={handleShuffle}>Try again</Button>
+          <Link to={`/verbs/${listId}`}><Button variant="secondary">Back to list</Button></Link>
+        </div>
+      </div>
+    );
   }
 
   return (
