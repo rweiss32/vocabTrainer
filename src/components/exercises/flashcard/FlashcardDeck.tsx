@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Word } from '../../../types';
 import { FlashcardCard } from './FlashcardCard';
 import { Button } from '../../common/Button';
-import { recordAnswer } from '../../../services/storage';
+import { useListStats } from '../../../hooks/useListStats';
+import { getStatColor } from '../../common/StatDot';
 
 interface FlashcardDeckProps {
   words: Word[];
@@ -19,10 +20,21 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function FlashcardDeck({ words, listId }: FlashcardDeckProps) {
-  const [deck, setDeck] = useState<Word[]>(() => [...words]);
+  const { stats, recordAnswer, refresh } = useListStats(listId);
+  const [weakOnly, setWeakOnly] = useState(false);
+  const [showTranslationFirst, setShowTranslationFirst] = useState(false);
+
+  const weakWords = words.filter((w) => {
+    const color = getStatColor(stats[w.id]);
+    return color === 'red' || color === 'yellow';
+  });
+  const hasWeakWords = weakWords.length > 0;
+  const activeWords = weakOnly && hasWeakWords ? weakWords : words;
+
+  const [deck, setDeck] = useState<Word[]>(() => shuffle(activeWords));
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const [showTranslationFirst, setShowTranslationFirst] = useState(false);
+
   const current = deck[index];
 
   const goTo = useCallback((i: number) => {
@@ -43,20 +55,31 @@ export function FlashcardDeck({ words, listId }: FlashcardDeckProps) {
     return () => window.removeEventListener('keydown', handleKey);
   }, [prev, next]);
 
-  function handleShuffle() {
-    setDeck(shuffle(words));
+  function rebuildDeck(pool: Word[]) {
+    setDeck(shuffle(pool));
     setIndex(0);
     setFlipped(false);
   }
 
+  function handleToggleWeak() {
+    const next = !weakOnly;
+    setWeakOnly(next);
+    refresh();
+    rebuildDeck(next && hasWeakWords ? weakWords : words);
+  }
+
+  function handleShuffle() {
+    rebuildDeck(weakOnly && hasWeakWords ? weakWords : words);
+  }
+
   function handleRate(correct: boolean) {
-    recordAnswer(listId, current.id, correct);
+    recordAnswer(current.id, correct);
     if (index < deck.length - 1) goTo(index + 1);
   }
 
   return (
     <div className="flex flex-col items-center gap-6">
-      {/* Progress */}
+      {/* Progress + weak toggle */}
       <div className="w-full flex items-center gap-3">
         <div className="flex-1 bg-gray-200 rounded-full h-1.5">
           <div
@@ -65,6 +88,18 @@ export function FlashcardDeck({ words, listId }: FlashcardDeckProps) {
           />
         </div>
         <span className="text-sm text-gray-500 shrink-0">{index + 1} / {deck.length}</span>
+        {hasWeakWords && (
+          <button
+            onClick={handleToggleWeak}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-colors shrink-0 ${
+              weakOnly
+                ? 'bg-amber-100 border-amber-300 text-amber-700'
+                : 'bg-white border-gray-300 text-gray-500 hover:border-amber-300 hover:text-amber-600'
+            }`}
+          >
+            {weakOnly ? '⚡ Weak words' : 'All words'}
+          </button>
+        )}
       </div>
 
       {/* Card */}

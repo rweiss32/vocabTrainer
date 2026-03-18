@@ -26,7 +26,7 @@ export function VerbTypingSession({ verbs, listId }: VerbTypingSessionProps) {
 
   const weakVerbs = verbs.filter((v) => {
     const color = getStatColor(stats[v.id]);
-    return color === 'red' || color === 'yellow' || color === 'gray';
+    return color === 'red' || color === 'yellow';
   });
   const hasWeakVerbs = weakVerbs.length > 0;
 

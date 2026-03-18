@@ -1,13 +1,5 @@
-import type { ListStats, ItemStat } from '../../types';
-
-function getColor(stat: ItemStat): 'green' | 'yellow' | 'red' {
-  const total = stat.correct + stat.incorrect;
-  if (total < 3) return 'yellow';
-  const rate = stat.correct / total;
-  if (rate >= 0.8) return 'green';
-  if (rate >= 0.5) return 'yellow';
-  return 'red';
-}
+import type { ListStats } from '../../types';
+import { getStatColor } from './StatDot';
 
 interface StatsSummaryBarProps {
   stats: ListStats;
@@ -19,9 +11,9 @@ export function StatsSummaryBar({ stats, total }: StatsSummaryBarProps) {
   const seen = entries.length;
   if (seen === 0) return null;
 
-  const mastered = entries.filter((s) => getColor(s) === 'green').length;
-  const learning = entries.filter((s) => getColor(s) === 'yellow').length;
-  const struggling = entries.filter((s) => getColor(s) === 'red').length;
+  const mastered = entries.filter((s) => getStatColor(s) === 'green').length;
+  const learning = entries.filter((s) => getStatColor(s) === 'yellow').length;
+  const struggling = entries.filter((s) => getStatColor(s) === 'red').length;
   const unseen = total - seen;
 
   return (

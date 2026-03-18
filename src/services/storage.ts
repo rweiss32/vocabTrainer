@@ -93,10 +93,40 @@ export function deleteVerbList(id: string): void {
 
 // --- Stats ---
 
+const STAT_HISTORY_MAX = 10;
+
+function parseStatEntry(val: unknown): import('../types').ItemStat | undefined {
+  if (typeof val !== 'object' || val === null) return undefined;
+  const v = val as Record<string, unknown>;
+  if (Array.isArray(v.history)) {
+    return { history: v.history as boolean[], lastSeen: (v.lastSeen as number) ?? 0 };
+  }
+  // Migrate old format { correct, incorrect, lastSeen }
+  if (typeof v.correct === 'number' && typeof v.incorrect === 'number') {
+    const c = v.correct as number;
+    const inc = v.incorrect as number;
+    const total = Math.min(c + inc, STAT_HISTORY_MAX);
+    const correctInWindow = Math.round((c / (c + inc)) * total);
+    const history: boolean[] = [
+      ...Array(correctInWindow).fill(true),
+      ...Array(total - correctInWindow).fill(false),
+    ];
+    return { history, lastSeen: (v.lastSeen as number) ?? 0 };
+  }
+  return undefined;
+}
+
 export function getListStats(listId: string): ListStats {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.STATS_PREFIX + listId);
-    return raw ? (JSON.parse(raw) as ListStats) : {};
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const stats: ListStats = {};
+    for (const [id, val] of Object.entries(parsed)) {
+      const entry = parseStatEntry(val);
+      if (entry) stats[id] = entry;
+    }
+    return stats;
   } catch {
     return {};
   }
@@ -108,10 +138,9 @@ export function saveListStats(listId: string, stats: ListStats): void {
 
 export function recordAnswer(listId: string, itemId: string, correct: boolean): void {
   const stats = getListStats(listId);
-  const existing = stats[itemId] ?? { correct: 0, incorrect: 0, lastSeen: 0 };
+  const existing = stats[itemId] ?? { history: [], lastSeen: 0 };
   stats[itemId] = {
-    correct: existing.correct + (correct ? 1 : 0),
-    incorrect: existing.incorrect + (correct ? 0 : 1),
+    history: [...existing.history, correct].slice(-STAT_HISTORY_MAX),
     lastSeen: Date.now(),
   };
   saveListStats(listId, stats);

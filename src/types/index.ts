@@ -34,9 +34,8 @@ export interface VerbList {
 }
 
 export interface ItemStat {
-  correct: number;
-  incorrect: number;
-  lastSeen: number; // timestamp ms
+  history: boolean[]; // last 10 results, newest last
+  lastSeen: number;   // timestamp ms
 }
 
 export type ListStats = Record<string, ItemStat>; // keyed by word/verb id

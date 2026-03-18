@@ -26,7 +26,7 @@ export function TypingSession({ words, listId }: TypingSessionProps) {
 
   const weakWords = words.filter((w) => {
     const color = getStatColor(stats[w.id]);
-    return color === 'red' || color === 'yellow' || color === 'gray';
+    return color === 'red' || color === 'yellow';
   });
   const hasWeakWords = weakWords.length > 0;
 

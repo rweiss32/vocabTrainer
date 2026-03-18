@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Verb } from '../../../types';
 import { VerbFlashcardCard } from './VerbFlashcardCard';
 import { Button } from '../../common/Button';
-import { recordAnswer } from '../../../services/storage';
+import { useListStats } from '../../../hooks/useListStats';
+import { getStatColor } from '../../common/StatDot';
 
 interface VerbFlashcardDeckProps {
   verbs: Verb[];
@@ -19,7 +20,17 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function VerbFlashcardDeck({ verbs, listId }: VerbFlashcardDeckProps) {
-  const [deck, setDeck] = useState<Verb[]>(() => [...verbs]);
+  const { stats, recordAnswer, refresh } = useListStats(listId);
+  const [weakOnly, setWeakOnly] = useState(false);
+
+  const weakVerbs = verbs.filter((v) => {
+    const color = getStatColor(stats[v.id]);
+    return color === 'red' || color === 'yellow';
+  });
+  const hasWeakVerbs = weakVerbs.length > 0;
+  const activeVerbs = weakOnly && hasWeakVerbs ? weakVerbs : verbs;
+
+  const [deck, setDeck] = useState<Verb[]>(() => shuffle(activeVerbs));
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
@@ -43,19 +54,31 @@ export function VerbFlashcardDeck({ verbs, listId }: VerbFlashcardDeckProps) {
     return () => window.removeEventListener('keydown', handleKey);
   }, [prev, next]);
 
-  function handleShuffle() {
-    setDeck(shuffle(verbs));
+  function rebuildDeck(pool: Verb[]) {
+    setDeck(shuffle(pool));
     setIndex(0);
     setFlipped(false);
   }
 
+  function handleToggleWeak() {
+    const next = !weakOnly;
+    setWeakOnly(next);
+    refresh();
+    rebuildDeck(next && hasWeakVerbs ? weakVerbs : verbs);
+  }
+
+  function handleShuffle() {
+    rebuildDeck(weakOnly && hasWeakVerbs ? weakVerbs : verbs);
+  }
+
   function handleRate(correct: boolean) {
-    recordAnswer(listId, current.id, correct);
+    recordAnswer(current.id, correct);
     if (index < deck.length - 1) goTo(index + 1);
   }
 
   return (
     <div className="flex flex-col items-center gap-6">
+      {/* Progress + weak toggle */}
       <div className="w-full flex items-center gap-3">
         <div className="flex-1 bg-gray-200 rounded-full h-1.5">
           <div
@@ -64,6 +87,18 @@ export function VerbFlashcardDeck({ verbs, listId }: VerbFlashcardDeckProps) {
           />
         </div>
         <span className="text-sm text-gray-500 shrink-0">{index + 1} / {deck.length}</span>
+        {hasWeakVerbs && (
+          <button
+            onClick={handleToggleWeak}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-colors shrink-0 ${
+              weakOnly
+                ? 'bg-amber-100 border-amber-300 text-amber-700'
+                : 'bg-white border-gray-300 text-gray-500 hover:border-amber-300 hover:text-amber-600'
+            }`}
+          >
+            {weakOnly ? '⚡ Weak verbs' : 'All verbs'}
+          </button>
+        )}
       </div>
 
       <VerbFlashcardCard

@@ -35,7 +35,7 @@ export function WordTable({ words, editable = false, stats, onUpdate, onDelete }
       <table className="w-full text-sm">
         <thead className="bg-gray-50">
           <tr>
-            {showStats && <th className="px-3 py-3 w-8" />}
+            {showStats && <th className="px-3 py-3 text-left font-medium text-gray-600 select-none whitespace-nowrap">Score</th>}
             <th
               className="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900 select-none"
               onClick={() => toggleSort('term')}
