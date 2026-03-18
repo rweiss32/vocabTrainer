@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Verb } from '../../types';
+import { Button } from '../common/Button';
 
 interface VerbTableProps {
   verbs: Verb[];
@@ -8,110 +9,116 @@ interface VerbTableProps {
   onDelete?: (verbId: string) => void;
 }
 
-function EditableCell({
-  value,
-  onSave,
-}: {
-  value: string;
-  onSave: (v: string) => void;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
-
-  function commit() {
-    const trimmed = draft.trim();
-    if (trimmed && trimmed !== value) onSave(trimmed);
-    else setDraft(value);
-    setEditing(false);
+export function VerbTable({ verbs, editable = false, onUpdate, onDelete }: VerbTableProps) {
+  if (verbs.length === 0) {
+    return <p className="text-sm text-gray-400 text-center py-8">No verbs yet.</p>;
   }
 
-  if (editing) {
-    return (
-      <input
-        autoFocus
-        className="w-full border border-indigo-400 rounded px-1 py-0.5 text-sm outline-none"
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') commit();
-          if (e.key === 'Escape') { setDraft(value); setEditing(false); }
-        }}
-      />
-    );
-  }
-
-  return (
-    <span
-      className="cursor-pointer hover:text-indigo-600 hover:underline underline-offset-2"
-      onClick={() => { setDraft(value); setEditing(true); }}
-    >
-      {value || <span className="text-gray-300 italic">—</span>}
-    </span>
-  );
-}
-
-export function VerbTable({ verbs, editable, onUpdate, onDelete }: VerbTableProps) {
   return (
     <div className="overflow-x-auto rounded-xl border border-gray-200">
       <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <thead className="bg-gray-50">
+          <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
             <th className="px-4 py-3">V1 — Base</th>
             <th className="px-4 py-3">V2 — Past simple</th>
             <th className="px-4 py-3">V3 — Past participle</th>
             <th className="px-4 py-3">Meaning</th>
-            {editable && <th className="px-4 py-3 w-10" />}
+            {editable && <th className="px-4 py-3 w-12" />}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody>
           {verbs.map((verb) => (
-            <tr key={verb.id} className="group bg-white hover:bg-gray-50">
-              <td className="px-4 py-3 font-medium text-gray-900">
-                {editable && onUpdate ? (
-                  <EditableCell value={verb.v1} onSave={(v) => onUpdate(verb.id, 'v1', v)} />
-                ) : (
-                  verb.v1
-                )}
-              </td>
-              <td className="px-4 py-3 text-gray-700">
-                {editable && onUpdate ? (
-                  <EditableCell value={verb.v2} onSave={(v) => onUpdate(verb.id, 'v2', v)} />
-                ) : (
-                  verb.v2
-                )}
-              </td>
-              <td className="px-4 py-3 text-gray-700">
-                {editable && onUpdate ? (
-                  <EditableCell value={verb.v3} onSave={(v) => onUpdate(verb.id, 'v3', v)} />
-                ) : (
-                  verb.v3
-                )}
-              </td>
-              <td className="px-4 py-3 text-gray-500">
-                {editable && onUpdate ? (
-                  <EditableCell value={verb.meaning ?? ''} onSave={(v) => onUpdate(verb.id, 'meaning', v)} />
-                ) : (
-                  verb.meaning ?? <span className="text-gray-300 italic">—</span>
-                )}
-              </td>
-              {editable && onDelete && (
-                <td className="px-4 py-3">
-                  <button
-                    className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
-                    onClick={() => onDelete(verb.id)}
-                    title="Delete verb"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </td>
-              )}
-            </tr>
+            <VerbRow
+              key={verb.id}
+              verb={verb}
+              editable={editable}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+            />
           ))}
         </tbody>
       </table>
     </div>
+  );
+}
+
+type EditableField = 'v1' | 'v2' | 'v3' | 'meaning';
+
+interface VerbRowProps {
+  verb: Verb;
+  editable: boolean;
+  onUpdate?: (verbId: string, field: keyof Omit<Verb, 'id'>, value: string) => void;
+  onDelete?: (verbId: string) => void;
+}
+
+function VerbRow({ verb, editable, onUpdate, onDelete }: VerbRowProps) {
+  const [editingField, setEditingField] = useState<EditableField | null>(null);
+  const [value, setValue] = useState('');
+
+  function startEdit(field: EditableField) {
+    if (!editable) return;
+    setEditingField(field);
+    setValue(field === 'meaning' ? (verb.meaning ?? '') : verb[field]);
+  }
+
+  function commitEdit() {
+    if (editingField) {
+      const trimmed = value.trim();
+      // meaning is optional — allow clearing it; v1/v2/v3 require a value
+      if (editingField === 'meaning' || trimmed) {
+        onUpdate?.(verb.id, editingField, trimmed);
+      }
+    }
+    setEditingField(null);
+  }
+
+  const cellClass = `px-4 py-3 border-b border-gray-100 ${editable ? 'cursor-pointer hover:bg-gray-50' : ''}`;
+
+  function renderCell(field: EditableField, displayValue: string, textClass = 'text-gray-700') {
+    return (
+      <td className={cellClass} onClick={() => startEdit(field)}>
+        {editingField === field ? (
+          <input
+            autoFocus
+            className="border-b border-indigo-400 outline-none w-full bg-transparent"
+            value={value}
+            dir={field === 'meaning' ? 'auto' : undefined}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={commitEdit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') commitEdit();
+              if (e.key === 'Escape') setEditingField(null);
+            }}
+          />
+        ) : (
+          <span className={displayValue ? textClass : 'text-gray-300 italic'}>
+            {displayValue || '—'}
+          </span>
+        )}
+      </td>
+    );
+  }
+
+  return (
+    <tr className="group">
+      {renderCell('v1', verb.v1, 'text-gray-900 font-medium')}
+      {renderCell('v2', verb.v2)}
+      {renderCell('v3', verb.v3)}
+      {renderCell('meaning', verb.meaning ?? '')}
+      {editable && (
+        <td className="px-4 py-3 border-b border-gray-100">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 !p-1"
+            onClick={() => onDelete?.(verb.id)}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </Button>
+        </td>
+      )}
+    </tr>
   );
 }
