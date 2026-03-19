@@ -14,7 +14,8 @@ export function buildProgressText(
   verbLists: VerbList[],
   lang: 'en' | 'he',
 ): string {
-  const date = new Date().toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-GB');
+  const now = new Date();
+  const date = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   const wordSummaries = wordLists.map((l) => summarizeList(l.id, l.words.length, l.name));
   const verbSummaries = verbLists.map((l) => summarizeList(l.id, l.verbs.length, l.name));
   const allSummaries = [...wordSummaries, ...verbSummaries];
