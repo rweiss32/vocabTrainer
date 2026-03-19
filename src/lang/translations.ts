@@ -243,6 +243,7 @@ const en = {
 
   // Share progress
   'share.button': 'Share Progress',
+  'share.copy': 'Copy Progress',
   'share.copied': 'Copied!',
   'share.shared': 'Shared!',
 } as const;
@@ -490,6 +491,7 @@ const he: { [K in keyof typeof en]: string } = {
 
   // Share progress
   'share.button': 'שתף התקדמות',
+  'share.copy': 'העתק התקדמות',
   'share.copied': 'הועתק!',
   'share.shared': 'שותף!',
 };
