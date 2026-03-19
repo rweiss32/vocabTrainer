@@ -63,11 +63,7 @@ export function buildProgressText(
   return lines.join('\n');
 }
 
-export async function shareProgress(text: string): Promise<'shared' | 'copied'> {
-  if (navigator.share) {
-    await navigator.share({ text });
-    return 'shared';
-  }
+export async function shareProgress(text: string): Promise<'copied'> {
   await navigator.clipboard.writeText(text);
   return 'copied';
 }
