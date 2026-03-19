@@ -5,6 +5,7 @@ import * as storage from '../../services/storage';
 import { ExportAllModal } from '../common/ExportAllModal';
 import { ImportAllModal } from '../common/ImportAllModal';
 import { useLanguage } from '../../lang/LanguageContext';
+import { buildProgressText, shareProgress } from '../../services/shareProgress';
 import type { WordList, VerbList } from '../../types';
 
 interface AppShellProps {
@@ -19,6 +20,15 @@ export function AppShell({ children }: AppShellProps) {
   const importInputRef = useRef<HTMLInputElement>(null);
   const [exportData, setExportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[] } | null>(null);
   const [importData, setImportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[]; renamedWords: { original: string; renamed: string }[]; renamedVerbs: { original: string; renamed: string }[] } | null>(null);
+  const [shareTooltip, setShareTooltip] = useState<string | null>(null);
+
+  async function handleShare() {
+    const text = buildProgressText(storage.getWordLists(), storage.getVerbLists(), lang);
+    const result = await shareProgress(text);
+    const label = result === 'shared' ? t('share.shared') : t('share.copied');
+    setShareTooltip(label);
+    setTimeout(() => setShareTooltip(null), 2000);
+  }
 
   function handleExportClick() {
     setExportData({ wordLists: storage.getWordLists(), verbLists: storage.getVerbLists() });
@@ -117,6 +127,21 @@ export function AppShell({ children }: AppShellProps) {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
+            </button>
+            <button
+              onClick={handleShare}
+              title={shareTooltip ?? (navigator.share ? t('share.button') : t('share.copy'))}
+              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors relative"
+            >
+              {navigator.share ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+              )}
             </button>
             {!isSection && (
               <Link to={backHref} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 ml-2">
