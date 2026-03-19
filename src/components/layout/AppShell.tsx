@@ -24,9 +24,11 @@ export function AppShell({ children }: AppShellProps) {
 
   async function handleShare() {
     const text = buildProgressText(storage.getWordLists(), storage.getVerbLists(), lang);
-    await shareProgress(text);
-    setShareToast(true);
-    setTimeout(() => setShareToast(false), 2500);
+    const result = await shareProgress(text);
+    if (result === 'copied') {
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2500);
+    }
   }
 
   function handleExportClick() {
