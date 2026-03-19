@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Verb } from '../../../types';
 import { Button } from '../../common/Button';
+import { SpeakButton } from '../../common/SpeakButton';
 import { useLanguage } from '../../../lang/LanguageContext';
 
 interface VerbTypingQuestionProps {
@@ -52,7 +53,10 @@ export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: Ve
 
       <div className="text-center space-y-2">
         <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{t('verbTyping.q.v1Label')}</p>
-        <p className="text-4xl font-bold text-gray-900">{verb.v1}</p>
+        <div className="flex items-center justify-center gap-2">
+          <p className="text-4xl font-bold text-gray-900">{verb.v1}</p>
+          <SpeakButton text={verb.v1} className="text-gray-400 hover:text-indigo-500" />
+        </div>
         {verb.meaning && (
           <p className="text-sm text-gray-400">{verb.meaning}</p>
         )}
@@ -72,8 +76,9 @@ export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: Ve
             readOnly={submitted}
           />
           {submitted && !v2Correct && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 flex items-center gap-1 flex-wrap">
               {t('verbTyping.q.correctAnswer')} <span className="font-semibold text-gray-900">{verb.v2}</span>
+              <SpeakButton text={verb.v2} />
             </p>
           )}
         </div>
@@ -90,14 +95,18 @@ export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: Ve
             readOnly={submitted}
           />
           {submitted && !v3Correct && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 flex items-center gap-1 flex-wrap">
               {t('verbTyping.q.correctAnswer')} <span className="font-semibold text-gray-900">{verb.v3}</span>
+              <SpeakButton text={verb.v3} />
             </p>
           )}
         </div>
 
         {submitted && v2Correct && v3Correct && (
-          <p className="text-sm text-green-600 font-medium">{t('verbTyping.q.correct')}</p>
+          <p className="text-sm text-green-600 font-medium flex items-center gap-1">
+            {t('verbTyping.q.correct')}
+            <SpeakButton text={`${verb.v1}, ${verb.v2}, ${verb.v3}`} className="text-green-400 hover:text-green-600" />
+          </p>
         )}
       </div>
 

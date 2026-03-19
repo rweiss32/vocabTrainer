@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Word } from '../../../types';
 import { Button } from '../../common/Button';
+import { SpeakButton } from '../../common/SpeakButton';
 import { useLanguage } from '../../../lang/LanguageContext';
 
 interface TypingQuestionProps {
@@ -64,12 +65,16 @@ export function TypingQuestion({ word, questionNumber, total, onAnswer }: Typing
         />
 
         {submitted && !correct && (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 flex items-center gap-1 flex-wrap">
             {t('typing.q.correctAnswer')} <span className="font-semibold text-gray-900">{word.term}</span>
+            <SpeakButton text={word.term} />
           </p>
         )}
         {submitted && correct && (
-          <p className="text-sm text-green-600 font-medium">{t('typing.q.correct')}</p>
+          <p className="text-sm text-green-600 font-medium flex items-center gap-1">
+            {t('typing.q.correct')}
+            <SpeakButton text={word.term} className="text-green-400 hover:text-green-600" />
+          </p>
         )}
       </div>
 
