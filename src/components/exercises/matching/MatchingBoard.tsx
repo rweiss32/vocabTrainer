@@ -3,6 +3,7 @@ import type { Word } from '../../../types';
 import { MAX_MATCHING_PAIRS } from '../../../constants';
 import { recordAnswer } from '../../../services/storage';
 import { useLanguage } from '../../../lang/LanguageContext';
+import { SpeakButton } from '../../common/SpeakButton';
 
 interface MatchingBoardProps {
   words: Word[];
@@ -113,16 +114,23 @@ export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps)
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wider text-center">{t('matching.english')}</p>
-          {terms.map((id) => (
-            <button
-              key={id}
-              className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${stateClasses[getTermState(id)]}`}
-              onClick={() => getTermState(id) === 'correct' ? null : handleSelectTerm(id)}
-              disabled={matched.has(id)}
-            >
-              {wordMap.get(id)?.term}
-            </button>
-          ))}
+          {terms.map((id) => {
+            const state = getTermState(id);
+            const word = wordMap.get(id);
+            return (
+              <div
+                key={id}
+                role="button"
+                tabIndex={matched.has(id) ? -1 : 0}
+                className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all flex items-center justify-between gap-1 ${stateClasses[state]}`}
+                onClick={() => state !== 'correct' && !matched.has(id) && handleSelectTerm(id)}
+                onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && state !== 'correct' && !matched.has(id)) { e.preventDefault(); handleSelectTerm(id); } }}
+              >
+                <span>{word?.term}</span>
+                {word && <SpeakButton text={word.term} />}
+              </div>
+            );
+          })}
         </div>
         <div className="space-y-2">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wider text-center">{t('matching.translation')}</p>
