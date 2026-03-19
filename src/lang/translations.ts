@@ -240,6 +240,11 @@ const en = {
   'count.words_plural': '{n} words',
   'count.verbs': '{n} verb',
   'count.verbs_plural': '{n} verbs',
+
+  // Share progress
+  'share.button': 'Share Progress',
+  'share.copied': 'Copied!',
+  'share.shared': 'Shared!',
 } as const;
 
 const he: { [K in keyof typeof en]: string } = {
@@ -482,6 +487,11 @@ const he: { [K in keyof typeof en]: string } = {
   'count.words_plural': '{n} מילים',
   'count.verbs': 'פועל {n}',
   'count.verbs_plural': '{n} פעלים',
+
+  // Share progress
+  'share.button': 'שתף התקדמות',
+  'share.copied': 'הועתק!',
+  'share.shared': 'שותף!',
 };
 
 export type TranslationKey = keyof typeof en;
