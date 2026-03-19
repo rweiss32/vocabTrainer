@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Word, ListStats } from '../../types';
 import { Button } from '../common/Button';
 import { StatDot } from '../common/StatDot';
+import { SpeakButton } from '../common/SpeakButton';
 import { useLanguage } from '../../lang/LanguageContext';
 
 interface WordTableProps {
@@ -117,7 +118,10 @@ function WordRow({ word, editable, showStats, stat, onUpdate, onDelete }: WordRo
             onKeyDown={(e) => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditingField(null); }}
           />
         ) : (
-          <span className="text-gray-900">{word.term}</span>
+          <span className="flex items-center gap-1">
+            <span className="text-gray-900">{word.term}</span>
+            <SpeakButton text={word.term} />
+          </span>
         )}
       </td>
       <td className={cellClass} onClick={() => startEdit('translation')}>

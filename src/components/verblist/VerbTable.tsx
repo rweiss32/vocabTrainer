@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Verb, ListStats } from '../../types';
 import { Button } from '../common/Button';
 import { StatDot } from '../common/StatDot';
+import { SpeakButton } from '../common/SpeakButton';
 import { useLanguage } from '../../lang/LanguageContext';
 
 interface VerbTableProps {
@@ -84,7 +85,7 @@ function VerbRow({ verb, editable, showStats, stat, onUpdate, onDelete }: VerbRo
 
   const cellClass = `px-4 py-3 border-b border-gray-100 ${editable ? 'cursor-pointer hover:bg-gray-50' : ''}`;
 
-  function renderCell(field: EditableField, displayValue: string, textClass = 'text-gray-700') {
+  function renderCell(field: EditableField, displayValue: string, textClass = 'text-gray-700', speakable = false) {
     return (
       <td className={cellClass} onClick={() => startEdit(field)}>
         {editingField === field ? (
@@ -101,8 +102,11 @@ function VerbRow({ verb, editable, showStats, stat, onUpdate, onDelete }: VerbRo
             }}
           />
         ) : (
-          <span className={displayValue ? textClass : 'text-gray-300 italic'}>
-            {displayValue || '—'}
+          <span className="flex items-center gap-1">
+            <span className={displayValue ? textClass : 'text-gray-300 italic'}>
+              {displayValue || '—'}
+            </span>
+            {speakable && displayValue && <SpeakButton text={displayValue} />}
           </span>
         )}
       </td>
@@ -116,9 +120,9 @@ function VerbRow({ verb, editable, showStats, stat, onUpdate, onDelete }: VerbRo
           <StatDot stat={stat} />
         </td>
       )}
-      {renderCell('v1', verb.v1, 'text-gray-900 font-medium')}
-      {renderCell('v2', verb.v2)}
-      {renderCell('v3', verb.v3)}
+      {renderCell('v1', verb.v1, 'text-gray-900 font-medium', true)}
+      {renderCell('v2', verb.v2, 'text-gray-700', true)}
+      {renderCell('v3', verb.v3, 'text-gray-700', true)}
       {renderCell('meaning', verb.meaning ?? '')}
       {editable && (
         <td className="px-4 py-3 border-b border-gray-100">
