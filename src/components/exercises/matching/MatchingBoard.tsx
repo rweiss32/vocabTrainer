@@ -122,12 +122,12 @@ export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps)
                 key={id}
                 role="button"
                 tabIndex={matched.has(id) ? -1 : 0}
-                className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all flex items-center justify-between gap-1 ${stateClasses[state]}`}
+                className={`w-full px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all relative ${stateClasses[state]}`}
                 onClick={() => state !== 'correct' && !matched.has(id) && handleSelectTerm(id)}
                 onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && state !== 'correct' && !matched.has(id)) { e.preventDefault(); handleSelectTerm(id); } }}
               >
-                <span>{word?.term}</span>
-                {word && <SpeakButton text={word.term} />}
+                {word?.term}
+                {word && <span className="absolute top-1 right-1"><SpeakButton text={word.term} /></span>}
               </div>
             );
           })}
