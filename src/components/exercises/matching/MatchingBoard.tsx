@@ -127,7 +127,7 @@ export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps)
                 onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && state !== 'correct' && !matched.has(id)) { e.preventDefault(); handleSelectTerm(id); } }}
               >
                 {word?.term}
-                {word && <span className="absolute top-1 right-1"><SpeakButton text={word.term} /></span>}
+                {word && <span className="absolute top-1/2 -translate-y-1/2 right-1"><SpeakButton text={word.term} /></span>}
               </div>
             );
           })}
