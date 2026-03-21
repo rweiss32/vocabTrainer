@@ -4,6 +4,7 @@ import { MAX_MATCHING_PAIRS } from '../../../constants';
 import { recordAnswer } from '../../../services/storage';
 import { useLanguage } from '../../../lang/LanguageContext';
 import { SpeakButton } from '../../common/SpeakButton';
+import { useSounds } from '../../../hooks/useSounds';
 
 interface MatchingBoardProps {
   words: Word[];
@@ -24,6 +25,7 @@ type ItemState = 'idle' | 'selected' | 'correct' | 'wrong';
 
 export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps) {
   const { t } = useLanguage();
+  const { playMatch, playWrong } = useSounds();
   const pairs = useMemo(() => {
     const subset = shuffle(words).slice(0, MAX_MATCHING_PAIRS);
     return subset;
@@ -74,6 +76,7 @@ export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps)
   function checkMatch(termId: string, translationId: string) {
     if (termId === translationId) {
       // Correct!
+      playMatch();
       recordAnswer(listId, termId, true);
       const newMatched = new Set(matched);
       newMatched.add(termId);
@@ -85,6 +88,7 @@ export function MatchingBoard({ words, listId, onComplete }: MatchingBoardProps)
       }
     } else {
       // Wrong — highlight only the two chosen items, one per column
+      playWrong();
       setMistakes((m) => m + 1);
       setWrongTerm(termId);
       setWrongTranslation(translationId);

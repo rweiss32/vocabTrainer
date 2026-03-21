@@ -15,6 +15,7 @@ export interface WordList {
 export interface AppSettings {
   nativeLanguage: string;
   matchingPairCount: number;
+  soundEnabled: boolean;
 }
 
 export interface Verb {

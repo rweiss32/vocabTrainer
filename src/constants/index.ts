@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
 export const DEFAULT_SETTINGS = {
   nativeLanguage: 'Hebrew',
   matchingPairCount: 8,
+  soundEnabled: true,
 };
 
 export const MAX_FILE_ROWS = 500;

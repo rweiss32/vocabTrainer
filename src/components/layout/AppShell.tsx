@@ -7,6 +7,7 @@ import { ImportAllModal } from '../common/ImportAllModal';
 import { useLanguage } from '../../lang/LanguageContext';
 import { buildProgressText, shareProgress } from '../../services/shareProgress';
 import type { WordList, VerbList } from '../../types';
+import { playClick } from '../../services/sounds';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -21,6 +22,14 @@ export function AppShell({ children }: AppShellProps) {
   const [exportData, setExportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[] } | null>(null);
   const [importData, setImportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[]; renamedWords: { original: string; renamed: string }[]; renamedVerbs: { original: string; renamed: string }[] } | null>(null);
   const [shareToast, setShareToast] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(() => storage.getSettings().soundEnabled);
+
+  function toggleSound() {
+    const next = !soundEnabled;
+    setSoundEnabled(next);
+    storage.saveSettings({ ...storage.getSettings(), soundEnabled: next });
+    if (next) playClick();
+  }
 
   async function handleShare() {
     const text = buildProgressText(storage.getWordLists(), storage.getVerbLists(), lang);
@@ -95,6 +104,23 @@ export function AppShell({ children }: AppShellProps) {
           </div>
 
           <div className="ml-auto flex items-center gap-1">
+            {/* Sound toggle */}
+            <button
+              onClick={toggleSound}
+              title={soundEnabled ? 'Mute sounds' : 'Unmute sounds'}
+              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              {soundEnabled ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M12 6v12M9 6.253v13m0-13C7.832 5.477 6.246 5 4.5 5A2.5 2.5 0 002 7.5v9A2.5 2.5 0 004.5 19c1.746 0 3.332-.477 4.5-1.253" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                </svg>
+              )}
+            </button>
             {/* Language toggle */}
             <button
               onClick={toggleLang}

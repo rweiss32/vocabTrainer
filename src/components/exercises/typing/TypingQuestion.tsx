@@ -3,6 +3,7 @@ import type { Word } from '../../../types';
 import { Button } from '../../common/Button';
 import { SpeakButton } from '../../common/SpeakButton';
 import { useLanguage } from '../../../lang/LanguageContext';
+import { useSounds } from '../../../hooks/useSounds';
 
 interface TypingQuestionProps {
   word: Word;
@@ -13,6 +14,7 @@ interface TypingQuestionProps {
 
 export function TypingQuestion({ word, questionNumber, total, onAnswer }: TypingQuestionProps) {
   const { t } = useLanguage();
+  const { playCorrect, playWrong } = useSounds();
   const [input, setInput] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [correct, setCorrect] = useState(false);
@@ -29,6 +31,7 @@ export function TypingQuestion({ word, questionNumber, total, onAnswer }: Typing
     const isCorrect = input.trim().toLowerCase() === word.term.toLowerCase();
     setCorrect(isCorrect);
     setSubmitted(true);
+    if (isCorrect) playCorrect(); else playWrong();
   }
 
   function handleNext() {

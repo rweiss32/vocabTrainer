@@ -3,6 +3,7 @@ import type { Verb } from '../../../types';
 import { Button } from '../../common/Button';
 import { SpeakButton } from '../../common/SpeakButton';
 import { useLanguage } from '../../../lang/LanguageContext';
+import { useSounds } from '../../../hooks/useSounds';
 
 interface VerbTypingQuestionProps {
   verb: Verb;
@@ -13,6 +14,7 @@ interface VerbTypingQuestionProps {
 
 export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: VerbTypingQuestionProps) {
   const { t } = useLanguage();
+  const { playCorrect, playWrong } = useSounds();
   const [v2Input, setV2Input] = useState('');
   const [v3Input, setV3Input] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -34,6 +36,7 @@ export function VerbTypingQuestion({ verb, questionNumber, total, onAnswer }: Ve
     setV2Correct(isV2Correct);
     setV3Correct(isV3Correct);
     setSubmitted(true);
+    if (isV2Correct && isV3Correct) playCorrect(); else playWrong();
   }
 
   function handleNext() {

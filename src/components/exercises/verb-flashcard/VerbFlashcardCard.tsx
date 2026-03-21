@@ -1,6 +1,7 @@
 import type { Verb } from '../../../types';
 import { useLanguage } from '../../../lang/LanguageContext';
 import { SpeakButton } from '../../common/SpeakButton';
+import { useSounds } from '../../../hooks/useSounds';
 
 interface VerbFlashcardCardProps {
   verb: Verb;
@@ -10,8 +11,11 @@ interface VerbFlashcardCardProps {
 
 export function VerbFlashcardCard({ verb, flipped, onClick }: VerbFlashcardCardProps) {
   const { t } = useLanguage();
+  const { playFlip } = useSounds();
+
+  function handleClick() { playFlip(); onClick(); }
   return (
-    <div className="card-scene w-full h-64 cursor-pointer select-none" onClick={onClick}>
+    <div className="card-scene w-full h-64 cursor-pointer select-none" onClick={handleClick}>
       <div className={`card-flip ${flipped ? 'is-flipped' : ''}`}>
         {/* Front — V1 */}
         <div className="card-face bg-white rounded-2xl border-2 border-gray-200 shadow-sm flex flex-col items-center justify-center gap-3 p-8">

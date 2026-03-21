@@ -1,6 +1,7 @@
 import type { Word } from '../../../types';
 import { useLanguage } from '../../../lang/LanguageContext';
 import { SpeakButton } from '../../common/SpeakButton';
+import { useSounds } from '../../../hooks/useSounds';
 
 interface FlashcardCardProps {
   word: Word;
@@ -11,6 +12,9 @@ interface FlashcardCardProps {
 
 export function FlashcardCard({ word, flipped, showTranslationFirst, onClick }: FlashcardCardProps) {
   const { t } = useLanguage();
+  const { playFlip } = useSounds();
+
+  function handleClick() { playFlip(); onClick(); }
   const front = showTranslationFirst ? word.translation : word.term;
   const back = showTranslationFirst ? word.term : word.translation;
   const frontLabel = showTranslationFirst ? t('card.translation') : t('card.english');
@@ -19,7 +23,7 @@ export function FlashcardCard({ word, flipped, showTranslationFirst, onClick }: 
   const backIsEnglish = showTranslationFirst;
 
   return (
-    <div className="card-scene w-full h-64 cursor-pointer select-none" onClick={onClick}>
+    <div className="card-scene w-full h-64 cursor-pointer select-none" onClick={handleClick}>
       <div className={`card-flip ${flipped ? 'is-flipped' : ''}`}>
         {/* Front */}
         <div className="card-face bg-white rounded-2xl border-2 border-gray-200 shadow-sm flex flex-col items-center justify-center gap-3 p-8">
