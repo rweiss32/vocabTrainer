@@ -1,12 +1,15 @@
-import { useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useRef, useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { parseImportAll } from '../../services/importExport';
 import * as storage from '../../services/storage';
 import { ExportAllModal } from '../common/ExportAllModal';
 import { ImportAllModal } from '../common/ImportAllModal';
 import { useLanguage } from '../../lang/LanguageContext';
 import { buildProgressText, shareProgress } from '../../services/shareProgress';
+import { decodeShareUrl } from '../../services/shareUrl';
+import { ImportSharedListModal } from '../common/ImportSharedListModal';
 import type { WordList, VerbList } from '../../types';
+import type { SharedList } from '../../services/shareUrl';
 import { playClick } from '../../services/sounds';
 
 interface AppShellProps {
@@ -16,12 +19,24 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const { lang, toggleLang, t } = useLanguage();
   const location = useLocation();
+  const navigate = useNavigate();
   const inVerbs = location.pathname.startsWith('/verbs');
   const isSection = location.pathname === '/' || location.pathname === '/verbs';
   const importInputRef = useRef<HTMLInputElement>(null);
   const [exportData, setExportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[] } | null>(null);
   const [importData, setImportData] = useState<{ wordLists: WordList[]; verbLists: VerbList[]; renamedWords: { original: string; renamed: string }[]; renamedVerbs: { original: string; renamed: string }[] } | null>(null);
   const [shareToast, setShareToast] = useState(false);
+  const [pendingImport, setPendingImport] = useState<SharedList | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('import');
+    if (!encoded) return;
+    const shared = decodeShareUrl(encoded);
+    if (shared) setPendingImport(shared);
+    // Clean the URL immediately
+    navigate(location.pathname, { replace: true });
+  }, []);
   const [soundEnabled, setSoundEnabled] = useState(() => storage.getSettings().soundEnabled);
 
   function toggleSound() {
@@ -195,6 +210,57 @@ export function AppShell({ children }: AppShellProps) {
           renamedVerbs={importData.renamedVerbs}
           onConfirm={handleImportConfirm}
           onClose={() => setImportData(null)}
+        />
+      )}
+
+      {pendingImport && (
+        <ImportSharedListModal
+          shared={pendingImport}
+          existingNames={[
+            ...storage.getWordLists().map(l => l.name),
+            ...storage.getVerbLists().map(l => l.name),
+          ]}
+          onImport={(name) => {
+            if (pendingImport.type === 'words') {
+              const newList = storage.createWordList(name);
+              const words = pendingImport.words.map(w => ({ ...w, id: crypto.randomUUID() }));
+              storage.updateWordList(newList.id, { words });
+              navigate('/');
+            } else {
+              const newList = storage.createVerbList(name);
+              const verbs = pendingImport.verbs.map(v => ({ ...v, id: crypto.randomUUID() }));
+              storage.updateVerbList(newList.id, { verbs });
+              navigate('/verbs');
+            }
+            setPendingImport(null);
+            window.location.reload();
+          }}
+          onMerge={() => {
+            if (pendingImport.type === 'words') {
+              const existing = storage.getWordLists().find(l => l.name.toLowerCase() === pendingImport.name.toLowerCase());
+              if (existing) {
+                const existingTerms = new Set(existing.words.map(w => w.term.toLowerCase()));
+                const newWords = pendingImport.words
+                  .filter(w => !existingTerms.has(w.term.toLowerCase()))
+                  .map(w => ({ ...w, id: crypto.randomUUID() }));
+                storage.updateWordList(existing.id, { words: [...existing.words, ...newWords] });
+                navigate('/');
+              }
+            } else {
+              const existing = storage.getVerbLists().find(l => l.name.toLowerCase() === pendingImport.name.toLowerCase());
+              if (existing) {
+                const existingV1s = new Set(existing.verbs.map(v => v.v1.toLowerCase()));
+                const newVerbs = pendingImport.verbs
+                  .filter(v => !existingV1s.has(v.v1.toLowerCase()))
+                  .map(v => ({ ...v, id: crypto.randomUUID() }));
+                storage.updateVerbList(existing.id, { verbs: [...existing.verbs, ...newVerbs] });
+                navigate('/verbs');
+              }
+            }
+            setPendingImport(null);
+            window.location.reload();
+          }}
+          onClose={() => setPendingImport(null)}
         />
       )}
 
