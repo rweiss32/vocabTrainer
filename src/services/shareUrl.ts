@@ -44,7 +44,7 @@ export function buildShareUrl(list: WordList | VerbList, type: 'words' | 'verbs'
     };
   }
   const encoded = encode(JSON.stringify(payload));
-  return `${window.location.origin}/vocabTrainer/?import=${encoded}`;
+  return `${window.location.origin}/vocabTrainer/?import=${encodeURIComponent(encoded)}`;
 }
 
 export function decodeShareUrl(encoded: string): SharedList | null {
