@@ -74,7 +74,7 @@ export function WordListCard({ list, existingNames, onDelete, onRename }: WordLi
 
       {shareUrl && (
         <div className="flex items-center gap-2 text-xs text-indigo-600 font-medium">
-          <span>{t('shareUrl.linkCopiedMsg')}</span>
+          <span>{t('shareUrl.linkCopiedMsg', { name: list.name })}</span>
           <a
             href={`https://wa.me/?text=${encodeURIComponent(shareUrl)}`}
             target="_blank"

@@ -250,7 +250,7 @@ const en = {
   'shareUrl.listName': 'List name',
   'shareUrl.nameConflict': 'A list with this name already exists. Rename it or merge into the existing one.',
   'shareUrl.mergeIntoExisting': 'Merge into existing',
-  'shareUrl.linkCopiedMsg': 'Link copied! Share it via:',
+  'shareUrl.linkCopiedMsg': "Link to '{name}' copied to clipboard! Share via:",
   'shareUrl.whatsapp': 'WhatsApp',
 
   // Share progress
@@ -510,7 +510,7 @@ const he: { [K in keyof typeof en]: string } = {
   'shareUrl.listName': 'שם הרשימה',
   'shareUrl.nameConflict': 'רשימה בשם זה כבר קיימת. שנה את השם או מזג לתוך הקיימת.',
   'shareUrl.mergeIntoExisting': 'מזג לתוך הקיימת',
-  'shareUrl.linkCopiedMsg': 'הקישור הועתק! שתף אותו דרך:',
+  'shareUrl.linkCopiedMsg': "קישור לרשימה '{name}' הועתק ללוח! שתף דרך:",
   'shareUrl.whatsapp': 'וואטסאפ',
 
   // Share progress
