@@ -8,7 +8,6 @@ import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
 import { EditableTitle } from '../components/common/EditableTitle';
 import { StatsSummaryBar } from '../components/common/StatsSummaryBar';
-import { exportLists } from '../services/importExport';
 
 interface ExerciseCardProps {
   to: string;
@@ -58,13 +57,7 @@ export function ListDetailPage() {
           <p className="text-sm text-gray-500 mt-1">{wordLabel}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => exportLists([list])}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            {t('listDetail.export')}
-          </Button>
-          <Link to={`/list/${id}/edit`}>
+<Link to={`/list/${id}/edit`}>
             <Button variant="secondary">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
