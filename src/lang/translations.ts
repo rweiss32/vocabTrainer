@@ -241,6 +241,18 @@ const en = {
   'count.verbs': '{n} verb',
   'count.verbs_plural': '{n} verbs',
 
+  // Share list via URL
+  'shareUrl.copyLink': 'Copy link',
+  'shareUrl.linkCopied': 'Link copied!',
+  'shareUrl.importTitle': 'Import shared list',
+  'shareUrl.importDescription': 'Someone shared this list with you. Add it to your lists?',
+  'shareUrl.importConfirm': 'Add to my lists',
+  'shareUrl.listName': 'List name',
+  'shareUrl.nameConflict': 'A list with this name already exists. Rename it or merge into the existing one.',
+  'shareUrl.mergeIntoExisting': 'Merge into existing',
+  'shareUrl.linkCopiedMsg': 'Link copied! Share it via:',
+  'shareUrl.whatsapp': 'WhatsApp',
+
   // Share progress
   'share.button': 'Share Progress',
   'share.copy': 'Copy progress to clipboard',
@@ -488,6 +500,18 @@ const he: { [K in keyof typeof en]: string } = {
   'count.words_plural': '{n} מילים',
   'count.verbs': 'פועל {n}',
   'count.verbs_plural': '{n} פעלים',
+
+  // Share list via URL
+  'shareUrl.copyLink': 'העתק קישור',
+  'shareUrl.linkCopied': 'קישור הועתק!',
+  'shareUrl.importTitle': 'ייבוא רשימה משותפת',
+  'shareUrl.importDescription': 'מישהו שיתף איתך רשימה זו. להוסיף לרשימות שלך?',
+  'shareUrl.importConfirm': 'הוסף לרשימות שלי',
+  'shareUrl.listName': 'שם הרשימה',
+  'shareUrl.nameConflict': 'רשימה בשם זה כבר קיימת. שנה את השם או מזג לתוך הקיימת.',
+  'shareUrl.mergeIntoExisting': 'מזג לתוך הקיימת',
+  'shareUrl.linkCopiedMsg': 'הקישור הועתק! שתף אותו דרך:',
+  'shareUrl.whatsapp': 'וואטסאפ',
 
   // Share progress
   'share.button': 'שתף התקדמות',
