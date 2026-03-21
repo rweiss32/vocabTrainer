@@ -3,32 +3,33 @@ import * as storage from '../services/storage';
 import type { WordList } from '../types';
 
 export function useWordLists() {
-  const [lists, setLists] = useState<WordList[]>(() => storage.getWordLists());
+  const sorted = (ls: WordList[]) => [...ls].sort((a, b) => a.name.localeCompare(b.name));
+  const [lists, setLists] = useState<WordList[]>(() => sorted(storage.getWordLists()));
 
   const refresh = useCallback(() => {
-    setLists(storage.getWordLists());
+    setLists(sorted(storage.getWordLists()));
   }, []);
 
   const createList = useCallback((name: string): WordList => {
     const list = storage.createWordList(name);
-    setLists(storage.getWordLists());
+    setLists(sorted(storage.getWordLists()));
     return list;
   }, []);
 
   const deleteList = useCallback((id: string) => {
     storage.deleteWordList(id);
-    setLists(storage.getWordLists());
+    setLists(sorted(storage.getWordLists()));
   }, []);
 
   const renameList = useCallback((id: string, name: string) => {
     storage.updateWordList(id, { name });
-    setLists(storage.getWordLists());
+    setLists(sorted(storage.getWordLists()));
   }, []);
 
   const importLists = useCallback((newLists: WordList[]) => {
     const current = storage.getWordLists();
     storage.saveWordLists([...current, ...newLists]);
-    setLists(storage.getWordLists());
+    setLists(sorted(storage.getWordLists()));
   }, []);
 
   return { lists, createList, deleteList, renameList, importLists, refresh };
