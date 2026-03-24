@@ -234,6 +234,8 @@ const en = {
   'form.suggestionError': 'Could not fetch suggestion.',
   'form.add': 'Add',
   'form.meaningOptional': 'Meaning (optional)',
+  'form.duplicateWord': 'This word already exists in the list.',
+  'form.duplicateVerb': 'This verb (V1) already exists in the list.',
 
   // Word / verb counts
   'count.words': '{n} word',
@@ -494,6 +496,8 @@ const he: { [K in keyof typeof en]: string } = {
   'form.suggestionError': 'לא ניתן לאחזר הצעה.',
   'form.add': 'הוסף',
   'form.meaningOptional': 'משמעות (אופציונלי)',
+  'form.duplicateWord': 'מילה זו כבר קיימת ברשימה.',
+  'form.duplicateVerb': 'פועל זה (V1) כבר קיים ברשימה.',
 
   // Word / verb counts
   'count.words': 'מילה {n}',

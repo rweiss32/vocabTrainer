@@ -4,7 +4,7 @@ import { translateToHebrew } from '../../services/translationService';
 import { useLanguage } from '../../lang/LanguageContext';
 
 interface AddWordFormProps {
-  onAdd: (term: string, translation: string) => void;
+  onAdd: (term: string, translation: string) => boolean;
 }
 
 export function AddWordForm({ onAdd }: AddWordFormProps) {
@@ -14,6 +14,7 @@ export function AddWordForm({ onAdd }: AddWordFormProps) {
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [suggestionError, setSuggestionError] = useState(false);
+  const [isDuplicate, setIsDuplicate] = useState(false);
   const termRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -54,7 +55,12 @@ export function AddWordForm({ onAdd }: AddWordFormProps) {
     const trimmedTerm = term.trim();
     const tr = translation.trim();
     if (!trimmedTerm || !tr) return;
-    onAdd(trimmedTerm, tr);
+    const added = onAdd(trimmedTerm, tr);
+    if (!added) {
+      setIsDuplicate(true);
+      return;
+    }
+    setIsDuplicate(false);
     setTerm('');
     setTranslation('');
     setSuggestion(null);
@@ -72,9 +78,12 @@ export function AddWordForm({ onAdd }: AddWordFormProps) {
           placeholder="e.g. ephemeral"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
           value={term}
-          onChange={(e) => setTerm(e.target.value)}
+          onChange={(e) => { setTerm(e.target.value); setIsDuplicate(false); }}
           onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); }}
         />
+        {isDuplicate && (
+          <p className="mt-1 text-xs text-red-500">{t('form.duplicateWord')}</p>
+        )}
       </div>
 
       <div className="flex-1">

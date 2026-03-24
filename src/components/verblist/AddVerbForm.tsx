@@ -3,7 +3,7 @@ import { Button } from '../common/Button';
 import { useLanguage } from '../../lang/LanguageContext';
 
 interface AddVerbFormProps {
-  onAdd: (v1: string, v2: string, v3: string, meaning?: string) => void;
+  onAdd: (v1: string, v2: string, v3: string, meaning?: string) => boolean;
 }
 
 export function AddVerbForm({ onAdd }: AddVerbFormProps) {
@@ -12,6 +12,7 @@ export function AddVerbForm({ onAdd }: AddVerbFormProps) {
   const [v2, setV2] = useState('');
   const [v3, setV3] = useState('');
   const [meaning, setMeaning] = useState('');
+  const [isDuplicate, setIsDuplicate] = useState(false);
   const v1Ref = useRef<HTMLInputElement>(null);
 
   function handleAdd() {
@@ -19,7 +20,12 @@ export function AddVerbForm({ onAdd }: AddVerbFormProps) {
     const trimV2 = v2.trim();
     const trimV3 = v3.trim();
     if (!trimV1 || !trimV2 || !trimV3) return;
-    onAdd(trimV1, trimV2, trimV3, meaning.trim() || undefined);
+    const added = onAdd(trimV1, trimV2, trimV3, meaning.trim() || undefined);
+    if (!added) {
+      setIsDuplicate(true);
+      return;
+    }
+    setIsDuplicate(false);
     setV1('');
     setV2('');
     setV3('');
@@ -39,9 +45,12 @@ export function AddVerbForm({ onAdd }: AddVerbFormProps) {
             placeholder="e.g. go"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
             value={v1}
-            onChange={(e) => setV1(e.target.value)}
+            onChange={(e) => { setV1(e.target.value); setIsDuplicate(false); }}
             onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
           />
+          {isDuplicate && (
+            <p className="mt-1 text-xs text-red-500">{t('form.duplicateVerb')}</p>
+          )}
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-500 mb-1">{t('verbTyping.q.v2Label')}</label>

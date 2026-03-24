@@ -10,12 +10,15 @@ export function useVerbList(id: string) {
     setList(updated);
   }, [id]);
 
-  const addVerb = useCallback((v1: string, v2: string, v3: string, meaning?: string) => {
+  const addVerb = useCallback((v1: string, v2: string, v3: string, meaning?: string): boolean => {
     const current = storage.getVerbList(id);
-    if (!current) return;
+    if (!current) return false;
+    const isDuplicate = current.verbs.some((v) => v.v1.toLowerCase() === v1.toLowerCase());
+    if (isDuplicate) return false;
     const verb: Verb = { id: crypto.randomUUID(), v1, v2, v3, meaning };
     const updated = storage.updateVerbList(id, { verbs: [...current.verbs, verb] });
     setList(updated);
+    return true;
   }, [id]);
 
   const updateVerb = useCallback((verbId: string, field: keyof Omit<Verb, 'id'>, value: string) => {

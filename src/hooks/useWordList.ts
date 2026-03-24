@@ -14,12 +14,15 @@ export function useWordList(id: string) {
     setList(updated);
   }, [id]);
 
-  const addWord = useCallback((term: string, translation: string) => {
+  const addWord = useCallback((term: string, translation: string): boolean => {
     const current = storage.getWordList(id);
-    if (!current) return;
+    if (!current) return false;
+    const isDuplicate = current.words.some((w) => w.term.toLowerCase() === term.toLowerCase());
+    if (isDuplicate) return false;
     const word: Word = { id: crypto.randomUUID(), term, translation };
     const updated = storage.updateWordList(id, { words: [...current.words, word] });
     setList(updated);
+    return true;
   }, [id]);
 
   const updateWord = useCallback((wordId: string, field: 'term' | 'translation', value: string) => {
