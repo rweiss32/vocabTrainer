@@ -12,6 +12,7 @@ import { VerbListDetailPage } from './pages/VerbListDetailPage';
 import { EditVerbListPage } from './pages/EditVerbListPage';
 import { VerbFlashcardPage } from './pages/VerbFlashcardPage';
 import { VerbTypingPage } from './pages/VerbTypingPage';
+import { WordListTablePage } from './pages/WordListTablePage';
 
 const router = createBrowserRouter(
   [
@@ -38,6 +39,10 @@ const router = createBrowserRouter(
     {
       path: '/list/:id/exercise/typing',
       element: <AppShell><TypingPage /></AppShell>,
+    },
+    {
+      path: '/list/:id/exercise/wordlist',
+      element: <AppShell><WordListTablePage /></AppShell>,
     },
     {
       path: '/verbs',

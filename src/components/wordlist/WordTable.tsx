@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Word, ListStats } from '../../types';
 import { Button } from '../common/Button';
-import { StatDot } from '../common/StatDot';
+import { StatDot, statCounts } from '../common/StatDot';
 import { SpeakButton } from '../common/SpeakButton';
 import { useLanguage } from '../../lang/LanguageContext';
 
@@ -13,19 +13,33 @@ interface WordTableProps {
   onDelete?: (id: string) => void;
 }
 
+function wordScore(word: Word, stats: ListStats | undefined): number {
+  if (!stats) return 0;
+  const stat = stats[word.id];
+  if (!stat) return 0;
+  const { correct, total } = statCounts(stat);
+  if (total < 3) return 0;
+  return correct / total;
+}
+
 export function WordTable({ words, editable = false, stats, onUpdate, onDelete }: WordTableProps) {
   const { t } = useLanguage();
   const showStats = stats !== undefined;
-  const [sortField, setSortField] = useState<'term' | 'translation'>('term');
+  const [sortField, setSortField] = useState<'term' | 'translation' | 'score'>('term');
   const [sortAsc, setSortAsc] = useState(true);
 
-  function toggleSort(field: 'term' | 'translation') {
+  function toggleSort(field: 'term' | 'translation' | 'score') {
     if (sortField === field) setSortAsc((a) => !a);
     else { setSortField(field); setSortAsc(true); }
   }
 
   const sorted = [...words].sort((a, b) => {
-    const cmp = a[sortField].localeCompare(b[sortField]);
+    let cmp: number;
+    if (sortField === 'score') {
+      cmp = wordScore(a, stats) - wordScore(b, stats);
+    } else {
+      cmp = a[sortField].localeCompare(b[sortField]);
+    }
     return sortAsc ? cmp : -cmp;
   });
 
@@ -38,7 +52,14 @@ export function WordTable({ words, editable = false, stats, onUpdate, onDelete }
       <table className="w-full text-sm">
         <thead className="bg-gray-50">
           <tr>
-            {showStats && <th className="px-3 py-3 text-left font-medium text-gray-600 select-none whitespace-nowrap">{t('table.score')}</th>}
+            {showStats && (
+              <th
+                className="px-3 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900 select-none whitespace-nowrap"
+                onClick={() => toggleSort('score')}
+              >
+                {t('table.score')} {sortField === 'score' ? (sortAsc ? '↑' : '↓') : ''}
+              </th>
+            )}
             <th
               className="px-4 py-3 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900 select-none"
               onClick={() => toggleSort('term')}

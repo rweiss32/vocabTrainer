@@ -63,6 +63,8 @@ const en = {
   'exercise.typing.desc': 'See the translation, type the English term',
   'exercise.verbFlashcards.desc': 'See V1, flip to reveal V2 and V3',
   'exercise.verbTyping.desc': 'See V1, type V2 and V3',
+  'exercise.wordList': 'Word List',
+  'exercise.wordList.desc': 'Browse words alphabetically, filter by score',
 
   // Flashcard deck
   'flashcard.prev': 'Prev',
@@ -143,8 +145,16 @@ const en = {
   // Exercise page titles and empty states
   'page.flashcards.title': 'Flashcards — {name}',
   'page.typing.title': 'Typing — {name}',
+  'page.wordList.title': 'Word List — {name}',
   'page.noWords': 'No words in this list.',
   'page.noVerbs': 'No verbs in this list.',
+
+  // Word list table page
+  'wordList.filterLabel': 'Show:',
+  'wordList.filter.all': 'All words',
+  'wordList.noMatch': 'No words match the current filter.',
+  'wordList.wordCount': '{n} words',
+  'wordList.wordCountFiltered': '{n} of {total} words',
 
   // Tables
   'table.score': 'Score',
@@ -325,6 +335,8 @@ const he: { [K in keyof typeof en]: string } = {
   'exercise.typing.desc': 'ראה את התרגום, הקלד את המילה באנגלית',
   'exercise.verbFlashcards.desc': 'ראה V1, הפוך לגילוי V2 ו-V3',
   'exercise.verbTyping.desc': 'ראה V1, הקלד V2 ו-V3',
+  'exercise.wordList': 'רשימת מילים',
+  'exercise.wordList.desc': 'עיין במילים לפי סדר אלפביתי, סנן לפי ניקוד',
 
   // Flashcard deck
   'flashcard.prev': 'קודם',
@@ -405,8 +417,16 @@ const he: { [K in keyof typeof en]: string } = {
   // Exercise page titles and empty states
   'page.flashcards.title': 'כרטיסיות — {name}',
   'page.typing.title': 'הקלדה — {name}',
+  'page.wordList.title': 'רשימת מילים — {name}',
   'page.noWords': 'אין מילים ברשימה זו.',
   'page.noVerbs': 'אין פעלים ברשימה זו.',
+
+  // Word list table page
+  'wordList.filterLabel': 'הצג:',
+  'wordList.filter.all': 'כל המילים',
+  'wordList.noMatch': 'אין מילים התואמות את הסינון הנוכחי.',
+  'wordList.wordCount': '{n} מילים',
+  'wordList.wordCountFiltered': '{n} מתוך {total} מילים',
 
   // Tables
   'table.score': 'ניקוד',
